@@ -1,0 +1,18 @@
+﻿@using Web_CSV_Json_XML_reader.Models
+@using Web_CSV_Json_XML_reader.Controllers
+@model string;
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>JSON Reader</title>
+    <meta charset="utf-8" />
+</head>
+<body>
+<h1>JSON Viewer</h1>
+<form method="POST">
+    @Html.Raw(Model);
+    <input type="submit" value="Save"/>
+</form>
+</body>
+</html>

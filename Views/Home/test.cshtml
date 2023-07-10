@@ -1,0 +1,70 @@
+﻿@using Web_CSV_Json_XML_reader.Models
+@using Web_CSV_Json_XML_reader.Controllers
+@model CSVDataTable;
+@{
+    int i = 0;
+    int j = 0;
+}
+@functions{
+    public CSVDataTable FormAnswer(int i_lenght, int j_lenght)
+    {
+        CSVDataTable dataTable = new CSVDataTable();
+
+        for (int i = 0; i < i_lenght; i++)
+        {
+            dataTable.Data.Add(new string[j_lenght]);
+            for (int j = 0; j < j_lenght; j++)
+            {
+                dataTable.Data[i][j] = "";
+            }
+        }
+        return dataTable;
+    }
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test</title>
+    <meta charset="utf-8" />
+</head>
+<body>
+    <h2>Time: @DateTime.Now.ToShortTimeString()</h2>
+    <br />
+    @if (Model != null)
+    {
+        <form method="post" action="/Home/csvsave">
+            <p>
+                Выберите тип сохраняемого файла
+                <select name="FileType">
+                    <option value="CSV">CSV</option>
+                    <option value="JSON">JSON</option>
+                    <option value="XML">XML</option>
+                </select>
+            </p>
+            <input type="submit" name="Save" value="Send">
+            <p >@Model.Name</p>
+            <table border="1" cellpadding="1" cellspacing="1" align="center">
+                @foreach(string[] line in Model.Data)
+                {
+                
+                    <tr>
+                        @foreach(string cell in line)
+                        {
+                            <td><input name="cell[@i,@j]" value="@cell"></td>
+                            j++;
+                        }
+                        
+                    </tr>
+                    i++;
+                    j = 0;
+                }
+                <input type="number" value="@Model.Data[0].Length" name="j_lenght">
+                <input type="number" value="@Model.Data.Count" name="i_lenght">
+                <input name="FileName" value="@Model.Name">
+            </table>
+        </form>
+    }
+
+</body>
+</html>
