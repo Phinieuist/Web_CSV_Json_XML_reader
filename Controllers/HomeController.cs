@@ -65,7 +65,8 @@ namespace Web_CSV_Json_XML_reader.Controllers
                 }
             }
 
-            return DownloadFile(FileSaver.Save(FileSaver.FileType.CSV, saveFileType, dataTable, null, null), FileSaver.GetFileName(saveFileType, dataTable.Name));
+            return DownloadFile(FileSaver.SaveCSV(dataTable), FileSaver.GetFileName(saveFileType, dataTable.Name));
+            //return DownloadFile(FileSaver.Save(FileSaver.FileType.CSV, saveFileType, dataTable, null, null), FileSaver.GetFileName(saveFileType, dataTable.Name));
 
             //CSVReader.Save(dataTable, @"C:\Users\user\Desktop\2\универ\магистратура\1 курс 2 семестр\Интеллектуальный анализ данных\Сем2\diabetesShort_Saved.csv");
             //CSVReader.Save(dataTable, @".\diabetesShort_Saved.csv");
@@ -86,6 +87,11 @@ namespace Web_CSV_Json_XML_reader.Controllers
             string jsonHTML = JSONReader.ReadJsonForWeb(JToken.Parse(JSONExamlpes.test7));
 
             return View("JSON", jsonHTML);
+        }
+
+        public IActionResult TextInput()
+        {
+            return View();
         }
 
         public object JSONSave2()

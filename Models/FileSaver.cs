@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Data;
+using System.Runtime.InteropServices.JavaScript;
 using System.Text;
 
 namespace Web_CSV_Json_XML_reader.Models
@@ -77,7 +78,21 @@ namespace Web_CSV_Json_XML_reader.Models
             return result;
         }
 
+        public static Stream SaveCSV(CSVDataTable CSVDataToSave)
+        {
+            Stream result = null;
+            result = CSVReader.Save(CSVDataToSave);
+            return result;
+        }
 
+        public static Stream SaveJSON(JObject JSONDataToSave)
+        {
+            Stream result = null;
+
+            
+            
+            return result;
+        }
 
         public enum FileType
         {
