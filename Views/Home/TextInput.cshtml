@@ -1,8 +1,6 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+﻿@using Web_CSV_Json_XML_reader.Models
+@using Web_CSV_Json_XML_reader.Controllers
+@model TextInputViewModel;
 
 <!DOCTYPE html>
 <html>
@@ -11,6 +9,19 @@
     <meta charset="utf-8" />
 </head>
 <body>
-    <input type="text" style="width:100%; height:300px; align-self:center; align-content:flex-start"/>
+    <form method="post" action="/Home/TextSend">
+        <div>
+            <select name="type">
+                <option selected="true" value="@FileType.CSV">CSV</option>
+                <option value="@FileType.JSON">JSON</option>
+                <option value="@FileType.XML">XML</option>
+            </select>
+            <input type="text" name="CSVSeparator"></input>
+            <input type="submit"></input>
+        </div>
+        <div>
+            <textarea name="text"></textarea>
+        </div>
+    </form>
 </body>
 </html>

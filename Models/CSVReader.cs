@@ -28,21 +28,33 @@ namespace Web_CSV_Json_XML_reader.Models
             return new CSVDataTable(Columns);
         }
 
-        public static CSVDataTable TFPRead(string filePath, string separator = ",")
+        public static CSVDataTable TFPReadText(string csvtext, string outputName = "temp", string separator = ",")
         {
             List<string[]> result = new List<string[]>();
-            using (TextFieldParser parser = new TextFieldParser(filePath))
+            try
             {
-                parser.TextFieldType = FieldType.Delimited;
-                parser.SetDelimiters(separator);
-                while (!parser.EndOfData)
+                StringReader stringReader = new StringReader(csvtext);
+                using (TextFieldParser parser = new TextFieldParser(stringReader))
                 {
-                    string[] fields = parser.ReadFields();
-                    result.Add(fields);
+                    parser.TextFieldType = FieldType.Delimited;
+                    parser.SetDelimiters(separator);
+                    while (!parser.EndOfData)
+                    {
+                        string[] fields = parser.ReadFields();
+                        result.Add(fields);
+                    }
                 }
             }
-            
-            return new CSVDataTable(result, Path.GetFileName(filePath));
+            catch { }
+            return new CSVDataTable(result, outputName);
+        }
+
+        public static CSVDataTable TFPRead(string filePath, string separator = ",")
+        {
+            string text = File.ReadAllText(filePath);
+            TFPRead(text, Path.GetFileName(filePath));
+
+            return TFPReadText(text, Path.GetFileName(filePath), separator);
         }
 
         public static void Save(CSVDataTable dataTable, string Path, string separator = ",")

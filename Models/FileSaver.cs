@@ -93,12 +93,5 @@ namespace Web_CSV_Json_XML_reader.Models
             
             return result;
         }
-
-        public enum FileType
-        {
-            CSV,
-            JSON,
-            XML
-        }
     }
 }

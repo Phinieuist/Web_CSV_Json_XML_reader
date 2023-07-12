@@ -48,13 +48,14 @@ namespace Web_CSV_Json_XML_reader.Controllers
             return File(file, contentType, downloadFileName);
         }
 
-        public IActionResult csvsave(string? str)
+        [HttpPost]
+        public IActionResult csvsave()
         {
             CSVDataTable dataTable = new CSVDataTable();
             int i_lenght = Convert.ToInt32(Request.Form["i_lenght"]);
             int j_lenght = Convert.ToInt32(Request.Form["j_lenght"]);
-            dataTable.Name = Request.Form["FileName"].ToString();
-            FileSaver.FileType saveFileType = FileSaver.GetFileType(Request.Form["FileType"].ToString());
+            dataTable.Name = Request.Form["Name"].ToString();
+            //FileType saveFileType = FileSaver.GetFileType(Request.Form["FileType"].ToString());
 
             for (int i = 0; i < i_lenght; i++)
             {
@@ -64,34 +65,46 @@ namespace Web_CSV_Json_XML_reader.Controllers
                     dataTable.Data[i][j] = Request.Form[$"cell[{i},{j}]"].ToString();
                 }
             }
-
-            return DownloadFile(FileSaver.SaveCSV(dataTable), FileSaver.GetFileName(saveFileType, dataTable.Name));
-            //return DownloadFile(FileSaver.Save(FileSaver.FileType.CSV, saveFileType, dataTable, null, null), FileSaver.GetFileName(saveFileType, dataTable.Name));
-
-            //CSVReader.Save(dataTable, @"C:\Users\user\Desktop\2\универ\магистратура\1 курс 2 семестр\Интеллектуальный анализ данных\Сем2\diabetesShort_Saved.csv");
-            //CSVReader.Save(dataTable, @".\diabetesShort_Saved.csv");
-            //return DownloadFile(@".\diabetesShort_Saved.csv", dataTable.Name);
-            //return View("test", dataTable);
+            
+            return DownloadFile(FileSaver.SaveCSV(dataTable), FileSaver.GetFileName(FileType.CSV, dataTable.Name));
         }
 
         public object jsontest()
         {
-            //return JSONReader.Read(JSONExamlpes.SquidGame);
             return JSONReader.Read2();
         }
 
         public IActionResult JSON()
         {
-            //JSONViewModel viewModel = new JSONViewModel(JSONReader.ReadToViewModel(JSONExamlpes.test6));
-
             string jsonHTML = JSONReader.ReadJsonForWeb(JToken.Parse(JSONExamlpes.test7));
 
             return View("JSON", jsonHTML);
         }
 
+        
         public IActionResult TextInput()
         {
             return View();
+        }
+
+        [HttpPost]
+        public IActionResult TextSend(TextInputViewModel model)
+        {
+            ;
+            switch (model.Type)
+            {
+                case FileType.CSV:
+                    CSVDataTable dataTable = CSVReader.TFPReadText(model.Text, "webInput", model.CSVSeparator);
+                    dataTable.controller = this;
+                    return View("test", dataTable);
+                
+                case FileType.XML: break;
+                
+                case FileType.JSON:
+                    return View("JSON", JSONReader.ReadJsonForWeb(JToken.Parse(model.Text)));
+            }
+
+            return View("TextInput");
         }
 
         public object JSONSave2()
