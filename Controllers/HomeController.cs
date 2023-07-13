@@ -51,28 +51,9 @@ namespace Web_CSV_Json_XML_reader.Controllers
         [HttpPost]
         public IActionResult csvsave()
         {
-            CSVDataTable dataTable = new CSVDataTable();
-            int i_lenght = Convert.ToInt32(Request.Form["i_lenght"]);
-            int j_lenght = Convert.ToInt32(Request.Form["j_lenght"]);
-            dataTable.Name = Request.Form["Name"].ToString();
-            //FileType saveFileType = FileSaver.GetFileType(Request.Form["FileType"].ToString());
-
-            for (int i = 0; i < i_lenght; i++)
-            {
-                dataTable.Data.Add(new string[j_lenght]);
-                for (int j = 0; j < j_lenght; j++)
-                {
-                    dataTable.Data[i][j] = Request.Form[$"cell[{i},{j}]"].ToString();
-                }
-            }
-            
-            return DownloadFile(FileSaver.SaveCSV(dataTable), FileSaver.GetFileName(FileType.CSV, dataTable.Name));
+            return DownloadFile(FileSaver.SaveCSV(Request), FileSaver.GetFileName(FileType.CSV, Request.Form["Name"].ToString()));
         }
 
-        public object jsontest()
-        {
-            return JSONReader.Read2();
-        }
 
         public IActionResult JSON()
         {
@@ -95,126 +76,25 @@ namespace Web_CSV_Json_XML_reader.Controllers
             {
                 case FileType.CSV:
                     CSVDataTable dataTable = CSVReader.TFPReadText(model.Text, "webInput", model.CSVSeparator);
-                    dataTable.controller = this;
+                    dataTable.Separator = model.CSVSeparator;
                     return View("test", dataTable);
                 
-                case FileType.XML: break;
+                case FileType.XML:
+                    string str = XMLReader.Read(model.Text);
+                    return View("XML", str);
                 
                 case FileType.JSON:
-                    return View("JSON", JSONReader.ReadJsonForWeb(JToken.Parse(model.Text)));
+                    JToken token = JToken.Parse(model.Text);
+                    return View("JSON", new JSONViewModel(token, JSONReader.ReadJsonForWeb(token)));
             }
 
             return View("TextInput");
         }
 
-        public object JSONSave2()
+        public IActionResult JSONSave(JSONViewModel model)
         {
-            //JSONViewModel dataTable = new JSONViewModel();
-            JObject JSONobject = new JObject();
-            int i_lenght = Convert.ToInt32(Request.Form["i_lenght"]);
-            int j_lenght = Convert.ToInt32(Request.Form["j_lenght"]);
-            List<JSONSaveObj> jSONSaves = new List<JSONSaveObj>();
-
-
-            for (int i = 0; i < i_lenght; i++)
-            {
-
-                string value = "";
-                List<string> strings = new List<string>();
-                JSONSaveObj.JSONValueType type;
-
-                switch (Request.Form[$"cell[{i},{1}]_type"].ToString())
-                {
-                    case "Object": value += "{"; type = JSONSaveObj.JSONValueType.Object; break;
-                    case "Array": value += "["; type = JSONSaveObj.JSONValueType.Array; break;
-                    default: type = JSONSaveObj.JSONValueType.None; break;
-                }
-
-                for (int j = 1; j < j_lenght; j++)
-                {
-                    if (!string.IsNullOrEmpty(Request.Form[$"cell[{i},{j}]"]))
-                    {
-                        if (Request.Form[$"cell[{i},{1}]_type"].ToString() == "Array")
-                            value += Request.Form[$"cell[{i},{j}]"].ToString() + ",";
-                        else
-                            value += Request.Form[$"cell[{i},{j}]"].ToString() + ",";
-                    }
-                }
-
-                switch (Request.Form[$"cell[{i},{1}]_type"].ToString())
-                {
-                    case "Object": jSONSaves.Add(new JSONSaveObj(Request.Form[$"cell[{i},{0}]"].ToString(), value.Substring(0, value.Length - 1) + "}", type)); break;
-                    case "Array": jSONSaves.Add(new JSONSaveObj(Request.Form[$"cell[{i},{0}]"].ToString(), value.Substring(0, value.Length - 1) + "]", type)); break;
-                    default: jSONSaves.Add(new JSONSaveObj(Request.Form[$"cell[{i},{0}]"].ToString(), value.Substring(0, value.Length - 1), type)); break;
-                }
-            }
-
-            foreach (JSONSaveObj it in jSONSaves)
-            {
-                switch (it.Type)
-                {
-                    case JSONSaveObj.JSONValueType.Object: JSONobject.Add(it.Name, JObject.Parse((string)it.Value)); break;
-                    case JSONSaveObj.JSONValueType.Array: JSONobject.Add(it.Name, JObject.Parse((string)it.Value)); break;
-                    case JSONSaveObj.JSONValueType.None: JSONobject.Add(it.Name, (string)it.Value); break;
-                }
-            }
-
-            return JsonConvert.SerializeObject(JSONobject, Formatting.Indented);
-        }
-
-        public object JSONSave()
-        {
-            //JSONViewModel dataTable = new JSONViewModel();
-            JObject JSONobject = new JObject();
-            int i_lenght = Convert.ToInt32(Request.Form["i_lenght"]);
-            int j_lenght = Convert.ToInt32(Request.Form["j_lenght"]);
-            List<JSONSaveObj> jSONSaves = new List<JSONSaveObj>();
-
-
-            for (int i = 0; i < i_lenght; i++)
-            {
-
-                string value = "";
-                List<string> strings = new List<string>();
-                JSONSaveObj.JSONValueType type;
-
-                switch (Request.Form[$"cell[{i},{1}]_type"].ToString())
-                {
-                    case "Object": value += "{"; type = JSONSaveObj.JSONValueType.Object; break;
-                    case "Array": type = JSONSaveObj.JSONValueType.Array; break;
-                    default: type = JSONSaveObj.JSONValueType.None; break;
-                }
-
-                for (int j = 1; j < j_lenght; j++)
-                {                  
-                    if (!string.IsNullOrEmpty(Request.Form[$"cell[{i},{j}]"]))
-                    {
-                        if (Request.Form[$"cell[{i},{1}]_type"].ToString() == "Array")
-                            strings.Add(Request.Form[$"cell[{i},{j}]"].ToString());
-                        else
-                            value += Request.Form[$"cell[{i},{j}]"].ToString() + ",";
-                    }
-                }
-
-                switch (Request.Form[$"cell[{i},{1}]_type"].ToString())
-                {
-                    case "Object": jSONSaves.Add(new JSONSaveObj(Request.Form[$"cell[{i},{0}]"].ToString(), value.Substring(0, value.Length - 1) + "}", type)); break;
-                    case "Array": jSONSaves.Add(new JSONSaveObj(Request.Form[$"cell[{i},{0}]"].ToString(), strings.ToArray(), type)); break;
-                    default: jSONSaves.Add(new JSONSaveObj(Request.Form[$"cell[{i},{0}]"].ToString(), value.Substring(0, value.Length - 1), type)); break;
-                }
-            }
-
-            foreach (JSONSaveObj it in jSONSaves)
-            {
-                switch (it.Type)
-                {
-                    case JSONSaveObj.JSONValueType.Object: JSONobject.Add(it.Name, JObject.Parse((string)it.Value)); break;
-                    case JSONSaveObj.JSONValueType.Array: JSONobject.Add(it.Name, JArray.FromObject(it.Value)); break;
-                    case JSONSaveObj.JSONValueType.None: JSONobject.Add(it.Name, (string)it.Value); break;
-                }
-            }
-
-            return JsonConvert.SerializeObject(JSONobject, Formatting.Indented);
+            model.Data = JToken.Parse(Request.Form["Data"]);
+            return DownloadFile(FileSaver.SaveJSON(model.Data, Request), FileSaver.GetFileName(FileType.JSON, model.Name));
         }
 
         public IActionResult test()

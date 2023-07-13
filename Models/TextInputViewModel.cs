@@ -7,8 +7,6 @@
         public FileType Type { get; set; }
 
         public TextInputViewModel() { }
-
-        
     }
 
     public enum FileType

@@ -1,0 +1,22 @@
+﻿@using Web_CSV_Json_XML_reader.Models
+@using Web_CSV_Json_XML_reader.Controllers
+@model string;
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>XML Viewer</title>
+    <style>
+        details {
+            margin-left: 10px;
+        }
+
+        summary {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    @Html.Raw(Model)
+</body>
+</html>

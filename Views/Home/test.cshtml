@@ -5,27 +5,6 @@
     int i = 0;
     int j = 0;
 }
-@functions{
-    public CSVDataTable FormAnswer()
-    {
-        CSVDataTable dataTable = new CSVDataTable();
-        //dataTable.i_lenght = this.RouteData.Values["i_lenght"];
-        //dataTable.j_lenght = this.RouteData.Values["j_lenght"];
-
-        //dataTable.i_lenght = Convert.ToInt32(HttpContextAccessor.HttpContext.Request.Form["i_lenght"]);
-        //dataTable.j_lenght = Convert.ToInt32(HttpContextAccessor.HttpContext.Request.Form["j_lenght"]);
-
-        for (int i = 0; i < dataTable.i_lenght; i++)
-            {
-                dataTable.Data.Add(new string[(int)dataTable.j_lenght]);
-                for (int j = 0; j < dataTable.j_lenght; j++)
-                {
-                    //dataTable.Data[i][j] = HttpContextAccessor.HttpContext.Request.Form[$"cell[{i},{j}]"].ToString();
-                }
-            }
-        return dataTable;
-    }
-}
 
 <!DOCTYPE html>
 <html>
@@ -34,8 +13,6 @@
     <meta charset="utf-8" />
 </head>
 <body>
-    <h2>Time: @DateTime.Now.ToShortTimeString()</h2>
-    <br />
     @if (Model != null)
     {
         <form method="post" action="/Home/csvsave">
@@ -50,7 +27,6 @@
             </p>
             -->
             <input type="submit" name="Save">
-            <!--<button name="Save" onclick="myFunction()"/>-->
             <p>@Model.Name</p>
             <table border="1" cellpadding="1" cellspacing="1" align="center">
                 @foreach(string[] line in Model.Data)
@@ -69,30 +45,10 @@
                 }
                 <input type="number" value="@Model.Data[0].Length" name="j_lenght">
                 <input type="number" value="@Model.Data.Count" name="i_lenght">
+                <input value="@Model.Separator" name="Separator">
                 <input name="Name" value="@Model.Name">
             </table>
         </form>
-    }
-    @{/*
-        if (Model.controller.Request.Method == "POST" && Model.controller.Request.Form.ContainsKey("Save")){
-       
-        CSVDataTable dataTable = new CSVDataTable();
-        
-        dataTable.i_lenght = Convert.ToInt32(Model.controller.Request.Form["i_lenght"]);
-        dataTable.j_lenght = Convert.ToInt32(Model.controller.Request.Form["j_lenght"]);
-
-        for (int i = 0; i < dataTable.i_lenght; i++)
-            {
-                dataTable.Data.Add(new string[(int)dataTable.j_lenght]);
-                for (int j = 0; j < dataTable.j_lenght; j++)
-                {
-                    dataTable.Data[i][j] = Model.controller.Request.Form[$"cell[{i},{j}]"].ToString();
-                }
-            }
-        //Model.controller.csvsave(dataTable);
-        //Model.controller.Index();  
-        */
-    }
     }
 </body>
 </html>

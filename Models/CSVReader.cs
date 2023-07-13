@@ -31,21 +31,19 @@ namespace Web_CSV_Json_XML_reader.Models
         public static CSVDataTable TFPReadText(string csvtext, string outputName = "temp", string separator = ",")
         {
             List<string[]> result = new List<string[]>();
-            try
+
+            StringReader stringReader = new StringReader(csvtext);
+            using (TextFieldParser parser = new TextFieldParser(stringReader))
             {
-                StringReader stringReader = new StringReader(csvtext);
-                using (TextFieldParser parser = new TextFieldParser(stringReader))
+                parser.TextFieldType = FieldType.Delimited;
+                parser.SetDelimiters(separator);
+                while (!parser.EndOfData)
                 {
-                    parser.TextFieldType = FieldType.Delimited;
-                    parser.SetDelimiters(separator);
-                    while (!parser.EndOfData)
-                    {
-                        string[] fields = parser.ReadFields();
-                        result.Add(fields);
-                    }
+                    string[] fields = parser.ReadFields();
+                    result.Add(fields);
                 }
             }
-            catch { }
+
             return new CSVDataTable(result, outputName);
         }
 
@@ -57,53 +55,5 @@ namespace Web_CSV_Json_XML_reader.Models
             return TFPReadText(text, Path.GetFileName(filePath), separator);
         }
 
-        public static void Save(CSVDataTable dataTable, string Path, string separator = ",")
-        {
-            string Output = "";
-
-            foreach (string[] line in dataTable.Data)
-            {
-                for (int i = 0; i < line.Length; i++)
-                {
-                    if (i != line.Length - 1)
-                        Output += '"' + line[i] + '"' + separator;
-                    else
-                        Output += '"' + line[i] + '"' + "\n";
-
-                }
-            }
-
-            Output = Output.Remove(Output.LastIndexOf('\n'));
-
-            File.WriteAllText(Path, Output);
-        }
-
-        public static MemoryStream Save(CSVDataTable dataTable, string separator = ",")
-        {
-            string Output = "";
-
-            foreach (string[] line in dataTable.Data)
-            {
-                for (int i = 0; i < line.Length; i++)
-                {
-                    if (i != line.Length - 1)
-                        Output += '"' + line[i] + '"' + separator;
-                    else
-                        Output += '"' + line[i] + '"' + "\n";
-
-                }
-            }
-
-            Output = Output.Remove(Output.LastIndexOf('\n'));
-
-            MemoryStream stream = new MemoryStream();
-            StreamWriter writer = new StreamWriter(stream, Encoding.UTF8);
-
-            writer.Write(Output);
-
-            writer.Flush();
-            stream.Position = 0;
-            return stream;
-        }
     }
 }

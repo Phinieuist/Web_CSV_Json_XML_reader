@@ -106,93 +106,6 @@ namespace Web_CSV_Json_XML_reader.Models
 
     public class JSONReader
     {
-        public static object Read(string input)
-        {
-            //dynamic dynamicObject = JsonConvert.DeserializeObject<dynamic>(input);
-            //List<string> strings = new List<string>();
-
-            //foreach (dynamic item in dynamicObject )
-            //{
-            //    strings.Add(item.ToString());
-            //}
-
-            //for (int i = 0; i < strings.Count; i++)
-            ////strings[i] = Rpr(strings[i]);
-            //{
-            //    string repl = "{";
-            //    repl += strings[i];
-            //    repl += "}";
-            //    strings[i] = repl;
-            //}
-
-            //List<dynamic> list = new List<dynamic>();
-            //foreach (string item in strings)
-            //{
-            //    list.Add(JsonConvert.DeserializeObject<dynamic>(item));
-            //}
-
-            //foreach (dynamic it in list)
-            //    foreach (dynamic item in it)
-            //    {
-            //        strings.Add(item.ToString());
-            //    }
-
-            JObject dynamicObject = JsonConvert.DeserializeObject<JObject>(input);
-            string exit = "";
-
-            foreach (var property in dynamicObject.Properties())
-            {
-                exit += property.Name + ": " + property.Value + '\n';
-            }
-
-            return exit;
-        }
-
-        public static object Read2()
-        {
-            string jsonFilePath = @"C:\Users\user\Desktop\2\универ\магистратура\1 курс 2 семестр\Интеллектуальный анализ данных\Сем2\j.json"; // путь к файлу JSON
-
-            // Чтение содержимого файла JSON
-            string jsonData = File.ReadAllText(jsonFilePath);
-            string output = "";
-
-            JObject json = JObject.Parse(jsonData);
-            JArray tableData = (JArray)json["father"];
-            DataTable table = tableData.ToObject<DataTable>();
-            //DataTable table = JsonConvert.DeserializeObject<DataTable>(jsonData);
-
-            // Вывод содержимого таблицы в консоль
-            foreach (DataRow row in table.Rows)
-            {
-                foreach (DataColumn column in table.Columns)
-                {
-                    output += row[column] + "\t";
-                }
-                output += '\n';
-            }
-
-            return output;
-        }
-
-        public static JObject ReadToViewModel(string input)
-        {
-            JObject dynamicObject = JsonConvert.DeserializeObject<JObject>(input);
-            return dynamicObject;
-        }
-
-        private static string Rpr(string input)
-        {
-            string output = "";
-            for (int i = 0; i < input.Length; i++)
-            {
-                string one = "" + input[i];
-                if (one != "" && one != "\r" && one != "\n")
-                    output += input[i];
-            }
-            return output;
-
-        }
-
         // рекурсивная функция для обработки JSON-элементов и вывода на веб-страницу
         public static string ReadJsonForWeb(JToken token, string prefix = "")
         {
@@ -265,6 +178,5 @@ namespace Web_CSV_Json_XML_reader.Models
                 throw new Exception("Unknown JSON element type");
             }
         }
-
     }
 }

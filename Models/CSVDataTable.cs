@@ -9,9 +9,7 @@ namespace Web_CSV_Json_XML_reader.Models
     {
         public List<string[]> Data { get; set; }
         public string Name {get;set;}
-        public int i_lenght { get; set; }
-        public int j_lenght { get; set; }
-        public HomeController controller { get; set; }
+        public string Separator { get; set;}
 
         public DataTable ToDataTable(bool FirstRowIsColumnName = true)
         {

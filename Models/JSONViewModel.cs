@@ -4,36 +4,21 @@ namespace Web_CSV_Json_XML_reader.Models
 {
     public class JSONViewModel
     {
-        public JObject Data { get; set; }
-        
+        public JToken Data { get; set; }
+        public string RawHTML { get; set; }
+        public string Name { get; set; }
+
         public JSONViewModel() { }
 
-        public JSONViewModel(JObject data)
+        public JSONViewModel(JToken data)
         {
             Data = data;
         }
-    }
 
-    public class JSONSaveObj
-    {
-        public string Name { get; set; }
-        public object Value { get; set; }
-        public JSONValueType Type { get; set; }
-
-        public enum JSONValueType
+        public JSONViewModel(JToken data, string RawHTML)
         {
-            None,
-            Array,
-            Object
-        }
-
-        public JSONSaveObj() { }
-
-        public JSONSaveObj(string name, object value, JSONValueType type)
-        {
-            Name = name;
-            Value = value;
-            Type = type;
+            Data = data;
+            this.RawHTML = RawHTML;
         }
     }
 }

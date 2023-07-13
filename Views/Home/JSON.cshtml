@@ -1,6 +1,6 @@
 ﻿@using Web_CSV_Json_XML_reader.Models
 @using Web_CSV_Json_XML_reader.Controllers
-@model string;
+@model JSONViewModel;
 
 <!DOCTYPE html>
 <html>
@@ -10,9 +10,11 @@
 </head>
 <body>
 <h1>JSON Viewer</h1>
-<form method="POST">
-    @Html.Raw(Model);
-    <input type="submit" value="Save"/>
-</form>
+    <form method="POST" action="/Home/JSONSave">
+        <input type="submit" value="Save" />
+        <input type="text" name="Name" />
+        @Html.Raw(Model.RawHTML)
+        <input type="hidden" value="@Model.Data" name="Data" />    
+    </form>
 </body>
 </html>
