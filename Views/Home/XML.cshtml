@@ -3,6 +3,23 @@
 @model string;
 
 <!DOCTYPE html>
+<script>
+    function updateAttribute(element, attributeName) {
+        console.log("updateAttribute_start | element: " + element + " | attributeName : " + attributeName);
+        var newValue = element.value;
+        element.setAttribute(attributeName, newValue);
+        console.log("updateAttribute_end");
+    }
+
+    function updateAttributeValue(attributeName, newValue) {
+        console.log("updateAttributeValue_start | attributeName: " + attributeName + " | newValue : " + newValue);
+        var elements = document.querySelectorAll(`[id='${attributeName}']`);
+        elements.forEach(function (element) {
+            element.value = newValue;
+        });
+        console.log("updateAttributeValue_end");
+    }
+</script>
 <html>
 <head>
     <title>XML Viewer</title>

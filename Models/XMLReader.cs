@@ -1,4 +1,9 @@
-﻿using System.Xml;
+﻿using Microsoft.Extensions.Primitives;
+using System;
+using System.Reflection.Emit;
+using System.Text;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace Web_CSV_Json_XML_reader.Models
 {
@@ -6,50 +11,80 @@ namespace Web_CSV_Json_XML_reader.Models
     {
         public static string Read(string XMLtext)
         {
-            string Output = "";
+            //string Output = "";
 
             XmlDocument xmlDocument = new XmlDocument();
             xmlDocument.LoadXml(XMLtext);
 
-            XmlNode rootNode = xmlDocument.DocumentElement;
-            Output = ProcessNode(rootNode, 0);
+            //XmlNode rootNode = xmlDocument.DocumentElement;
+            //Output = ProcessNode(rootNode, 0);
 
-            return Output;
+            Dictionary<string, object> deserializedObject = (Dictionary<string, object>) Deserialize(xmlDocument.DocumentElement);
+
+            StringBuilder sb = new StringBuilder();
+
+            foreach(var it in deserializedObject)
+            {
+                sb.Append(it.ToString());
+            }
+
+            return sb.ToString();
         }
 
-        static string ProcessNode(XmlNode node, int level, string str)
+        static object Deserialize(XmlNode node)
         {
-            if (node.NodeType == XmlNodeType.Element)
+            // Проверка типа узла
+            switch (node.NodeType)
             {
-                str += new string(' ', level * 2) + "<" + node.Name + ">\n";
+                case XmlNodeType.Element:
+                    // Если узел является элементом, создаём новый словарь
+                    var dict = new Dictionary<string, object>();
 
-                if (node.Attributes != null)
-                {
+                    // Перебираем все атрибуты элемента и добавляем их в словарь
                     foreach (XmlAttribute attribute in node.Attributes)
                     {
-                        str += new string(' ', (level + 1) * 2) + "@" + attribute.Name + ": " + attribute.Value + "\n";
+                        dict[attribute.Name] = attribute.Value;
                     }
-                }
 
-                if (node.HasChildNodes)
-                {
+                    // Перебираем все дочерние узлы элемента
                     foreach (XmlNode childNode in node.ChildNodes)
                     {
-                        str += ProcessNode(childNode, level + 1, str);
+                        // Выполняем рекурсивную десериализацию каждого дочернего узла
+                        var childObject = Deserialize(childNode);
+
+                        // Если уже существует значение с таким же ключом,
+                        // то преобразуем его в список значений
+                        if (dict.ContainsKey(childNode.Name))
+                        {
+                            if (dict[childNode.Name] is List<object> list)
+                            {
+                                list.Add(childObject);
+                            }
+                            else
+                            {
+                                dict[childNode.Name] = new List<object> { dict[childNode.Name], childObject };
+                            }
+                        }
+                        else
+                        {
+                            dict[childNode.Name] = childObject;
+                        }
                     }
-                }
 
-                str += new string(' ', level * 2) + "</" + node.Name + ">\n";
-            }
-            else if (node.NodeType == XmlNodeType.Text)
-            {
-                str+= new string(' ', level * 2) + node.InnerText + "\n";
-            }
+                    return dict;
 
-            return str;
+                case XmlNodeType.Text:
+                case XmlNodeType.CDATA:
+                    // Если узел содержит текст или CDATA, возвращаем его значение
+                    return node.Value;
+
+                default:
+                    // Возвращаем null для всех остальных типов узлов
+                    return null;
+            }
         }
 
-        static string ProcessNode(XmlNode node, int level)
+        static string ProcessNode3(XmlNode node, int level)
         {
             string result = "";
 
@@ -63,7 +98,10 @@ namespace Web_CSV_Json_XML_reader.Models
                     result += "<ul>";
                     foreach (XmlAttribute attribute in node.Attributes)
                     {
-                        result += $"<li>{attribute.Name}: {attribute.Value}</li>";
+                        result += "<li>";
+                        result += $"<label>{attribute.Name}: </label>";
+                        result += $"<input type='text' id='{attribute.Name}' value='{attribute.Value}' onchange='updateAttributeValue(\"{attribute.Name}\", this.value)' />";
+                        result += "</li>";
                     }
                     result += "</ul>";
                 }
@@ -84,6 +122,100 @@ namespace Web_CSV_Json_XML_reader.Models
             }
 
             return result;
+        }
+
+        static string ProcessNode2(XmlNode node, int level)
+        {
+            string result = "";
+
+            if (node.NodeType == XmlNodeType.Element)
+            {
+                result += "<details>";
+                result += $"<summary>&lt;{node.Name}&gt;</summary>";
+
+                if (node.Attributes != null)
+                {
+                    result += "<ul>";
+                    foreach (XmlAttribute attribute in node.Attributes)
+                    {
+                        result += "<li>";
+                        result += $"<label>{attribute.Name}: </label>";
+                        result += $"<input type='text' value='{attribute.Value}' onchange='updateAttribute(this, \"{attribute.Name}\")' />";
+                        result += "</li>";
+                    }
+                    result += "</ul>";
+                }
+
+                if (node.HasChildNodes)
+                {
+                    foreach (XmlNode childNode in node.ChildNodes)
+                    {
+                        result += ProcessNode(childNode, level + 1);
+                    }
+                }
+
+                result += "</details>";
+            }
+            else if (node.NodeType == XmlNodeType.Text)
+            {
+                result += $"<p>{new string(' ', level * 4)}{node.InnerText}</p>";
+            }
+
+            return result;
+        }
+
+        static string ProcessNode(XmlNode node, int level, string prefix = "")
+        {
+            StringBuilder sb = new StringBuilder();
+
+            if (node.NodeType == XmlNodeType.Element)
+            {
+                string type = "text";
+                sb.Append("<details>");
+                sb.Append($"<summary>&lt;{node.Name}&gt;</summary>");
+                //$"<input type='{type}' name='{prefix}' value='{val.Value}'/>"
+                
+                if (node.Attributes != null)
+                {
+                    foreach (XmlAttribute attribute in node.Attributes)
+                    {
+                        sb.Append($"<li>{attribute.Name} : <input type='{type}' name='{prefix}.{attribute.Name}' value='{attribute.Value}'/></li>");
+                    }
+
+
+                    //for (int i = 0;i< node.Attributes.Count; i++)
+                    //{
+                    //    sb.Append($"<li>{node.Attributes[i].Name} : <input type='{type}' name='{prefix}.{node.Attributes[i].Name}[{i}]' value='{node.Attributes[i].Value}'/></li>");
+                    //}
+                    sb.Append("</ul>");
+                }
+
+                if (node.HasChildNodes)
+                {
+                    //foreach (XmlNode childNode in node.ChildNodes)
+                    //{
+                    //    sb.Append(ProcessNode(childNode, level + 1, $"{prefix}.{node.Name}"));
+                    //}
+
+                    //for (int i = 0; i < node.ChildNodes.Count; i++)
+                    //{                     
+                    //    sb.Append(ProcessNode(node.ChildNodes[i], level + 1, $"{prefix}.{node.ChildNodes[i].Name}[{i}]"));
+                    //}
+
+                    for (int i = 0; i < node.ChildNodes.Count; i++)
+                    {
+                        sb.Append(ProcessNode(node.ChildNodes[i], level + 1, $"{prefix}.level[{level}][{i}]"));
+                    }
+                }
+
+                sb.Append("</details>");
+            }
+            else if (node.NodeType == XmlNodeType.Text)
+            {
+                sb.Append($"<p>{new string(' ', level * 4)}{node.InnerText}</p>");
+            }
+
+            return sb.ToString();
         }
 
         public XMLReader() { }

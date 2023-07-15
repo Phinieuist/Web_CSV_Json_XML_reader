@@ -75,7 +75,10 @@ namespace Web_CSV_Json_XML_reader.Controllers
             switch (model.Type)
             {
                 case FileType.CSV:
-                    CSVDataTable dataTable = CSVReader.TFPReadText(model.Text, "webInput", model.CSVSeparator);
+                    string separator;
+                    if (string.IsNullOrEmpty(model.CSVSeparator)) separator = ",";
+                    else separator = model.CSVSeparator;
+                    CSVDataTable dataTable = CSVReader.TFPReadText(model.Text, "webInput", separator);
                     dataTable.Separator = model.CSVSeparator;
                     return View("test", dataTable);
                 
