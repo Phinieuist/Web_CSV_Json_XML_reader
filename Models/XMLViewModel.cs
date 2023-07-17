@@ -1,27 +1,28 @@
 ﻿using Newtonsoft.Json.Linq;
+using System.Xml;
 
 namespace Web_CSV_Json_XML_reader.Models
 {
-    public class JSONViewModel
+    public class XMLViewModel
     {
-        public JToken Data { get; set; }
-        public string RawHTML { get; set; }
         public string Name { get; set; }
+        public string RawHTML { get; set; }
+        public XmlDocument Data { get; set; }
 
-        public JSONViewModel() { }
+        public XMLViewModel() { }
 
-        public JSONViewModel(JToken data)
+        public XMLViewModel(XmlDocument data)
         {
             Data = data;
         }
 
-        public JSONViewModel(JToken data, string RawHTML)
+        public XMLViewModel(XmlDocument data, string RawHTML)
         {
             Data = data;
             this.RawHTML = RawHTML;
         }
 
-        public JSONViewModel(JToken data, string RawHTML, string Name)
+        public XMLViewModel(XmlDocument data, string RawHTML, string Name)
         {
             Data = data;
             this.RawHTML = RawHTML;

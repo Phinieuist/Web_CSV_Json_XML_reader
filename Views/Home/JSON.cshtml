@@ -12,7 +12,7 @@
 <h1>JSON Viewer</h1>
     <form method="POST" action="/Home/JSONSave">
         <input type="submit" value="Save" />
-        <input type="text" name="Name" />
+        <input type="text" name="Name" value="@Model.Name" />
         @Html.Raw(Model.RawHTML)
         <input type="hidden" value="@Model.Data" name="Data" />    
     </form>

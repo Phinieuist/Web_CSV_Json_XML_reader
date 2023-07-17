@@ -9,26 +9,11 @@ namespace Web_CSV_Json_XML_reader.Models
 {
     public class XMLReader
     {
-        public static string Read(string XMLtext)
+        public static string Read(XmlDocument xmlDocument)
         {
-            //string Output = "";
+            XmlNode rootNode = xmlDocument.DocumentElement;
 
-            XmlDocument xmlDocument = new XmlDocument();
-            xmlDocument.LoadXml(XMLtext);
-
-            //XmlNode rootNode = xmlDocument.DocumentElement;
-            //Output = ProcessNode(rootNode, 0);
-
-            Dictionary<string, object> deserializedObject = (Dictionary<string, object>) Deserialize(xmlDocument.DocumentElement);
-
-            StringBuilder sb = new StringBuilder();
-
-            foreach(var it in deserializedObject)
-            {
-                sb.Append(it.ToString());
-            }
-
-            return sb.ToString();
+            return ProcessNode(rootNode, 0, "root");
         }
 
         static object Deserialize(XmlNode node)

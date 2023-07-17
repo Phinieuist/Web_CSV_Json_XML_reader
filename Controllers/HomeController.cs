@@ -5,6 +5,7 @@ using Newtonsoft.Json.Linq;
 using System.Data;
 using System.Diagnostics;
 using System.Dynamic;
+using System.Xml;
 using Web_CSV_Json_XML_reader.Models;
 
 namespace Web_CSV_Json_XML_reader.Controllers
@@ -71,24 +72,31 @@ namespace Web_CSV_Json_XML_reader.Controllers
         [HttpPost]
         public IActionResult TextSend(TextInputViewModel model)
         {
-            ;
+            if (string.IsNullOrEmpty(model.Name))
+                model.Name = "WebInput";
+
             switch (model.Type)
             {
                 case FileType.CSV:
                     string separator;
                     if (string.IsNullOrEmpty(model.CSVSeparator)) separator = ",";
                     else separator = model.CSVSeparator;
-                    CSVDataTable dataTable = CSVReader.TFPReadText(model.Text, "webInput", separator);
+
+                    CSVDataTable dataTable = CSVReader.TFPReadText(model.Text, model.Name, separator);
                     dataTable.Separator = model.CSVSeparator;
+                    dataTable.Name = model.Name;
+
                     return View("test", dataTable);
                 
                 case FileType.XML:
-                    string str = XMLReader.Read(model.Text);
-                    return View("XML", str);
+                    XmlDocument xmlDoc = new XmlDocument();
+                    xmlDoc.LoadXml(model.Text);
+
+                    return View("XML", new XMLViewModel(xmlDoc, XMLReader.Read(xmlDoc), model.Name));
                 
                 case FileType.JSON:
                     JToken token = JToken.Parse(model.Text);
-                    return View("JSON", new JSONViewModel(token, JSONReader.ReadJsonForWeb(token)));
+                    return View("JSON", new JSONViewModel(token, JSONReader.ReadJsonForWeb(token), model.Name));
             }
 
             return View("TextInput");
@@ -98,6 +106,14 @@ namespace Web_CSV_Json_XML_reader.Controllers
         {
             model.Data = JToken.Parse(Request.Form["Data"]);
             return DownloadFile(FileSaver.SaveJSON(model.Data, Request), FileSaver.GetFileName(FileType.JSON, model.Name));
+        }
+
+        public IActionResult XMLSave(XMLViewModel model)
+        {
+            model.Data = new XmlDocument();
+            model.Data.LoadXml(Request.Form["Data"]);
+
+            return DownloadFile(FileSaver.SaveXML(model, Request), FileSaver.GetFileName(FileType.XML, model.Name));
         }
 
         public IActionResult test()
