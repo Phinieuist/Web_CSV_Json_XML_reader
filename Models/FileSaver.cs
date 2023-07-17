@@ -100,7 +100,6 @@ namespace Web_CSV_Json_XML_reader.Models
                         case JTokenType.String: val.Value = Convert.ToString(Request.Form[key]); break;
                         case JTokenType.Comment: val.Value = Convert.ToString(Request.Form[key]); break;
                     }
-                        //val.Value = Request.Form[key];
                 }
             }
 
@@ -119,7 +118,38 @@ namespace Web_CSV_Json_XML_reader.Models
             XmlDocument xmlDocument = model.Data;
             XmlNode rootNode = xmlDocument.DocumentElement;
 
-            ProcessNodeToSave(rootNode, 0, Request, ref xmlDocument, "root");
+            XmlNamespaceManager namespaceManager = new XmlNamespaceManager(xmlDocument.NameTable);
+            foreach (XmlAttribute attribute in rootNode.Attributes)
+            {
+                if (attribute.Name.StartsWith("xmlns:"))
+                {
+                    string prefix = attribute.LocalName;
+                    string ns = attribute.Value;
+                    namespaceManager.AddNamespace(prefix, ns);
+                }
+            }
+
+            List<string> Keys = Request.Form.Keys.ToList();
+            Keys.Remove("Name");
+            Keys.Remove("Data");
+
+            foreach (string key in Keys)
+            {
+                XmlNode node = xmlDocument.SelectSingleNode(key, namespaceManager);
+
+                if (node != null)
+                    switch (node.NodeType)
+                    {
+                        case XmlNodeType.Attribute:
+                            node.Value = Convert.ToString(Request.Form[key]);
+                            break;
+                        case XmlNodeType.Element:
+                            node.InnerText = Convert.ToString(Request.Form[key]);
+                            break;
+                        default:
+                            continue;
+                    }
+            }
 
             MemoryStream result = new MemoryStream();
             StreamWriter writer = new StreamWriter(result, Encoding.UTF8);
@@ -130,88 +160,5 @@ namespace Web_CSV_Json_XML_reader.Models
             result.Position = 0;
             return result;
         }
-
-        private static string ProcessNodeToSave(XmlNode node, int level, HttpRequest Request, ref XmlDocument xmlDocument, string prefix = "")
-        {
-            StringBuilder sb = new StringBuilder();
-
-            if (node.NodeType == XmlNodeType.Element)
-            {
-                if (node.Attributes != null)
-                {
-                    foreach (XmlAttribute attribute in node.Attributes)
-                    {
-                        sb.Append($"{prefix}.{attribute.Name}");
-                        //Request.Form[$"{prefix}.{attribute.Name}"];
-                        xmlDocument.SelectSingleNode(FindXPath(attribute)).Value = Convert.ToString(Request.Form[$"{prefix}.{attribute.Name}"]);
-                    }
-
-                }
-
-                if (node.HasChildNodes)
-                {
-                    for (int i = 0; i < node.ChildNodes.Count; i++)
-                    {
-                        sb.Append(ProcessNodeToSave(node.ChildNodes[i], level + 1, Request, ref xmlDocument, $"{prefix}.level[{level}][{i}]"));
-                    }
-                }
-
-            }
-            //else if (node.NodeType == XmlNodeType.Text)
-            //{
-            //    sb.Append($"<p>{new string(' ', level * 4)}{node.InnerText}</p>");
-            //}
-
-            return sb.ToString();
-        }
-
-        private static string FindXPath(XmlNode node)
-        {
-            StringBuilder builder = new StringBuilder();
-            while (node != null)
-            {
-                switch (node.NodeType)
-                {
-                    case XmlNodeType.Attribute:
-                        builder.Insert(0, "/@" + node.Name);
-                        node = ((XmlAttribute)node).OwnerElement;
-                        break;
-                    case XmlNodeType.Element:
-                        int index = FindElementIndex((XmlElement)node);
-                        builder.Insert(0, "/" + node.Name + "[" + index + "]");
-                        node = node.ParentNode;
-                        break;
-                    case XmlNodeType.Document:
-                        return builder.ToString();
-                    default:
-                        throw new ArgumentException("Only elements and attributes are supported");
-                }
-            }
-            throw new ArgumentException("Node was not in a document");
-        }
-
-        private static int FindElementIndex(XmlElement element)
-        {
-            XmlNode parentNode = element.ParentNode;
-            if (parentNode is XmlDocument)
-            {
-                return 1;
-            }
-            XmlElement parent = (XmlElement)parentNode;
-            int index = 1;
-            foreach (XmlNode candidate in parent.ChildNodes)
-            {
-                if (candidate is XmlElement && candidate.Name == element.Name)
-                {
-                    if (candidate == element)
-                    {
-                        return index;
-                    }
-                    index++;
-                }
-            }
-            throw new ArgumentException("Couldn't find element within parent");
-        }
-
     }
 }

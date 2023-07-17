@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<levelledPara>
+    <title>Инструкция по эксплуатации электронных весов BS-7920</title>
+    <levelledPara>
+        <title>Основные характеристики</title>
+        <randomList>
+            <listItem>Платформа из 8 мм закаленного стекла.</listItem>
+            <listItem>Ультратонкий дизайн: толщина 20 мм.</listItem>
+            <listItem>Определение содержания в организме: % жира, % воды и % мышечной массы.</listItem>
+            <listItem>Память на 12 человек.</listItem>
+            <listItem>Максимальный вес: 150 кг.</listItem>
+            <listItem>Точность взвешивания: 100 г.</listItem>
+            <listItem>Сенсорные кнопки.</listItem>
+            <listItem>Автоматическое включение / выключение.</listItem>
+            <listItem>Питание от литиевых батареек: 2 х 3 В СТ2032 (в комплекте).</listItem>
+        </randomList>
+    </levelledPara>
+    <levelledPara>
+        <title>Комплектация</title>
+        <randomList>
+            <listItem>Весы.</listItem>
+            <listItem>Две батареи типа “СR2032".</listItem>
+            <listItem>Инструкция.</listItem>
+            <listItem>Гарантийный талон.</listItem>
+        </randomList>
+    </levelledPara>
+    <levelledPara>
+        <title>Установка и замена батарей</title>
+        <table>
+            <tgroup>
+                <tbody>
+                    <row>
+                        <entry>
+                            <para>Для электропитания весов используются 2 батареи типа “СR2032". Напряжение каждой батареи 3 В. Батарейный отсек расположен в основании весов.</para>
+                            <para>Чтобы установить или заменить батареи повторите следующую процедуру:</para>
+                            <randomList>
+                                <listItem>Откройте крышку батарейного отсека и с помощью неметаллического заостренного предмета (рисунок справа) извлеките старые батареи.</listItem>
+                                <listItem>Установите новые батареи соблюдая полярность и закройте крышку батарейного отсека.</listItem>
+                            </randomList>
+                        </entry>
+                        <entry>
+                            <figure id="fig–0001">
+                                <graphic id="pic1" href="../pic1.jpg">
+                                </graphic>
+                            </figure>
+                        </entry>
+                    </row>
+                </tbody>
+            </tgroup>
+        </table>
+    </levelledPara>
+    <levelledPara>
+        <title>Эксплуатация и чистка</title>
+        <randomList>
+            <listItem>Используйте мягкую влажную ткань для чистки прибора. Не погружайте весы в воду. Не используйте едкие и абразивные чистящие средства.</listItem>
+            <listItem>Если на пластиковые части прибора попали капли лимонного сока, уксуса или прочих едких жидкостей, немедленно протрите их сухой тканью.</listItem>
+            <listItem>Устанавливайте весы только на ровную прочную поверхность. Не устанавливайте весы на мягкие и ворсистые поверхности (ковер, мат и т.п.).</listItem>
+        </randomList>
+    </levelledPara>
+    <levelledPara>
+        <title>Спецификация</title>
+        <table>
+            <tgroup>
+                <tbody>
+                    <row>
+                        <entry><para>Максимальный вес:</para></entry>
+                        <entry><para>150 кг</para></entry>
+                    </row>
+                    <row>
+                        <entry><para>Точность взвешивания:</para></entry>
+                        <entry><para>0.1 кг</para></entry>
+                    </row>
+                    <row>
+                        <entry><para>Диапазон расчета %жира:</para></entry>
+                        <entry><para>4.0% ~ 80.0%</para></entry>
+                    </row>
+                    <row>
+                        <entry><para>Точность расчета %жира:</para></entry>
+                        <entry><para>0.1 %</para></entry>
+                    </row>
+                    <row>
+                        <entry><para>Диапазон расчета %гидратации:</para></entry>
+                        <entry><para>27.5% ~ 88.0%</para></entry>
+                    </row>
+                    <row>
+                        <entry><para>Точность расчета %гидратации:</para></entry>
+                        <entry><para>0.1 %</para></entry>
+                    </row>
+                    <row>
+                        <entry><para>Диапазон расчета %мышечной массы:</para></entry>
+                        <entry><para>20.0% ~ 56.0%</para></entry>
+                    </row>
+                    <row>
+                        <entry><para>Точность расчета %мышечной массы:</para></entry>
+                        <entry><para>0.1 %</para></entry>
+                    </row>
+                </tbody>
+            </tgroup>
+        </table>
+        <para>В ЦЕЛЯХ УЛУЧШЕНИЯ КАЧЕСТВА ПРОДУКЦИИ ДИЗАЙН И СПЕЦИФИКАЦИЯ МОГУТ БЫТЬ ИЗМЕНЕНЫ БЕЗ ПРЕДВАРИТЕЛЬНОГО УВЕДОМЛЕНИЯ!</para>
+        <para>По истечении срока службы товара, необходимо обратиться в сервисный центр за консультацией по дальнейшей эксплуатации товара . В противном случае дальнейшая эксплуатация может повлечь невозможность нормального использования товара.</para>
+    </levelledPara>
+</levelledPara>
+
+
+
+
+

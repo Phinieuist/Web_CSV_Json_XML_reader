@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE animals>
+<animals>
+    <animal id="1" name="Белый медведь" description="Хищное млекопитающее семейства медвежьих, близкий родственник бурого медведя. Второй по величине сухопутный хищник планеты после гребнистого крокодила. Назван так из-за белой шерсти.">
+        <animal_food id="2">Северные олени</animal_food>
+        <animal_food>Овцебыки</animal_food>
+        <animal_food id="3">Морские зайцы</animal_food>
+    </animal>
+    <animal id="2" name="Северный олень" description="Парнокопытное млекопитающее семейства оленевых, единственный представитель рода Северные олени.">
+        <animal_food>Лишайники</animal_food>
+        <animal_food>Кустарники</animal_food>
+        <animal_food>Грибы</animal_food>
+    </animal>
+    <animal id="3" name="Морской заяц" description="Вид ластоногих из семейства настоящих тюленей.">
+        <animal_food>Креветки</animal_food>
+        <animal_food>Крабы</animal_food>
+        <animal_food>Моллюски</animal_food>
+        <animal_food>Морские черви</animal_food>
+    </animal>
+    <animal id="4" name="Косатка" description="Вид китообразных из семейства дельфиновых (дельфинов) парвотряда зубатых китов. Единственный современный представитель рода косаток. Признан самым крупным представителем своего семейства и единственный среди современных китообразных настоящий хищник, преследующий теплокровных животных.">
+        <animal_food id="3">Морские зайцы</animal_food>
+        <animal_food id="5">Пингвины</animal_food>
+        <animal_food>Тюлени</animal_food>
+    </animal>
+    <animal id="5" name="Пингвин" description="Семейство нелетающих морских птиц, единственное современное в отряде пингвинообразных. В него включают 18 современных видов. Все представители этого семейства хорошо плавают и ныряют.">
+        <animal_food>Анчоусы</animal_food>
+        <animal_food>Сардины</animal_food>
+        <animal_food>Ракообразыне</animal_food>
+    </animal>
+</animals>
+
