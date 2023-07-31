@@ -8,19 +8,19 @@ namespace Web_CSV_Json_XML_reader.Models
 {
     public class JSONExamlpes
     {
-        public static string SquidGame => @"
-        {
-        ""Name"": ""Squid Game"",
-        ""Genre"": ""Thriller"",
-        ""Rating"": {
-            ""Imdb"": 8.1,
-            ""Rotten Tomatoes"": 0.94
-        },
-        ""Year"": 2021,
-        ""Stars"": [""Lee Jung-jae"", ""Park Hae-soo""],
-        ""Language"": ""Korean"",
-        ""Budget"": ""$21.4 million""
-        }";
+        //public static string SquidGame => @"
+        //{
+        //"Name": "Squid Game",
+        //"Genre"": "Thriller",
+        //"Rating": {
+        //    "Imdb": 8.1,
+        //    "Rotten Tomatoes": 0.94
+        //},
+        //"Year": 2021,
+        //"Stars": ["Lee Jung-jae", "Park Hae-soo"],
+        //"Language": "Korean",
+        //"Budget": "$21.4 million"
+        //}";
 
         public static string test2 => @"{
         ""Name"": ""warqqq"",
@@ -117,7 +117,13 @@ namespace Web_CSV_Json_XML_reader.Models
                 string name = prefix;
                 string type = "text";
                 string addition = "";
-                if (val.Type == JTokenType.Integer || val.Type == JTokenType.Float)
+                string tag = "";
+
+                if (val.Type == JTokenType.String)
+                {
+                    return $"<textarea name='{name}' class=\"form-control textInp\">{val.Value}</textarea>";
+                }
+                else if (val.Type == JTokenType.Integer || val.Type == JTokenType.Float)
                 {
                     type = "number";
                 }
@@ -126,12 +132,14 @@ namespace Web_CSV_Json_XML_reader.Models
                     type = "checkbox";
                     if ((bool)val.Value)
                         addition = "checked";
+
+                    //return $"<input type='{type}' class=\"btn-check\" id=\"ID_{name}\" {addition} name='{name}' value='{val.Value}' autocomplete=\"off\"/><label class=\"btn btn-outline-primary\" for=\"ID_{name}\">___</label>";
                 }
                 else if (val.Type == JTokenType.Date)
                 {
                     type = "datetime-local";
                 }
-                return $"<input type='{type}' {addition} name='{name}' value='{val.Value}'/>";
+                return $"{tag}<input type='{type}' {addition} name='{name}' value='{val.Value}'/>{(tag!=""?tag.Insert(1, "/"):"")}";
             }
             else if (token is JArray)
             {
@@ -164,9 +172,9 @@ namespace Web_CSV_Json_XML_reader.Models
                 foreach (JProperty prop in obj.Properties())
                 {
                     sb.Append("<li>");
-                    sb.Append($"{prop.Name}: ");
+                    sb.Append($"<div class=\"input-group mb-3\"><div class=\"input-group-prepend\"><span class=\"input-group-text\">{prop.Name}</span></div>");
                     sb.Append(ReadJsonForWeb(prop.Value, $"{name}.{prop.Name}"));
-                    sb.Append("</li>");
+                    sb.Append("</div></li>");
                 }
                 sb.Append("</ul>");
                 sb.Append("</details></p>");

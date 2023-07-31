@@ -24,14 +24,15 @@ namespace Web_CSV_Json_XML_reader.Models
             if (node.NodeType == XmlNodeType.Element)
             {
                 string type = "text";
-                sb.Append("<details>");
-                sb.Append($"<summary>&lt;{node.Name}&gt;</summary>");
+                sb.Append($"<details><summary>&lt;{node.Name}&gt;</summary>");
 
                 if (node.Attributes != null)
                 {
+                    sb.Append("<ul>");
                     foreach (XmlAttribute attribute in node.Attributes)
                     {
-                        sb.Append($"<li>{attribute.Name} : <input type='{type}' name='{FindXPath(attribute)}' value='{attribute.Value}'/></li>");
+                        //sb.Append($"<li>{attribute.Name} : <input type='{type}' name='{FindXPath(attribute)}' value='{attribute.Value}'/></li>");
+                        sb.Append($"<li><div class=\"input-group mb-3\"><div class=\"input-group-prepend\"><span class=\"input-group-text\">{attribute.Name}</span></div> <textarea name='{FindXPath(attribute)}' class=\"form-control textInp\">{attribute.Value}</textarea></div></li>");
                     }
 
                     sb.Append("</ul>");
@@ -39,17 +40,22 @@ namespace Web_CSV_Json_XML_reader.Models
 
                 if (node.HasChildNodes)
                 {
+                    sb.Append("<ul>");
                     for (int i = 0; i < node.ChildNodes.Count; i++)
                     {
+                        sb.Append("<li>");
                         sb.Append(ProcessNode(node.ChildNodes[i], level + 1));
+                        sb.Append("</li>");
                     }
+                    sb.Append("</ul>");
                 }
 
                 sb.Append("</details>");
             }
             else if (node.NodeType == XmlNodeType.Text)
             {
-                sb.Append($"<p>{new string(' ', level * 4)} <input type='text' name='{FindXPath(node)}' value='{node.InnerText}' /></p>");
+                //sb.Append($"<p>{new string(' ', level * 4)} <input class=\"form-control\" type='text' name='{FindXPath(node)}' value='{node.InnerText}' /></p>");
+                sb.Append($"<p>{new string(' ', level * 4)} <textarea name='{FindXPath(node)}' class=\"form-control mb-3 textInp\">{node.InnerText}</textarea></p>");
             }
 
             return sb.ToString();

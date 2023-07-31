@@ -6,21 +6,23 @@
 <html>
 <head>
     <title>XML Viewer</title>
-    <style>
-        details {
-            margin-left: 10px;
-        }
-
-        summary {
-            cursor: pointer;
-        }
-    </style>
 </head>
 <body>
     <form method="POST" action="/Home/XMLSave">
-        <input type="submit" value="Save" />
-        <input type="text" name="Name" value="@Model.Name" />
-        @Html.Raw(Model.RawHTML)
+        <div class="centered">
+            <input class="btn btn-primary" type="submit" value="Save" /><br />
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">Название файла:</span>
+                </div>
+                <input type="text" class="form-control" aria-describedby="basic-addon3" name="Name" value="@Model.Name" />
+            </div>
+        </div>
+        <div class="div-for-raw">
+            <div>
+                @Html.Raw(Model.RawHTML)
+            </div>
+        </div>
         <input type="hidden" value="@Model.Data.OuterXml" name="Data" />
     </form>
 </body>

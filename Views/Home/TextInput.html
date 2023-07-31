@@ -1,0 +1,151 @@
+﻿@using Web_CSV_Json_XML_reader.Models
+@using Web_CSV_Json_XML_reader.Controllers
+@model TextInputViewModel;
+
+<!DOCTYPE html>
+<html>
+    <style>
+body
+{
+    font: 12px Arial;
+}
+
+#dropZone2
+{
+    border-radius: 5px;
+    border: 2px solid #ccc;
+    background-color: #eee;
+    width: 250px;
+    padding: 50px 0;
+    font-size: 18px;
+    color: #555;
+    margin: 50px auto;
+}
+
+#dropZone.hover
+{
+    border-color: #aaa;
+    background-color: #ddd;
+}
+
+#dropZone.error
+{
+    border-color: #f00;
+    background-color: #faa;
+} 
+    </style>
+<script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.6.1.min.js"></script>
+
+<script type="text/javascript">
+    var dropZone;
+
+    // Initializes the dropZone
+    $(document).ready(function () {
+        dropZone = $('#dropZone');
+        dropZone.removeClass('error');
+
+        // Check if window.FileReader exists to make
+        // sure the browser supports file uploads
+        if (typeof(window.FileReader) == 'undefined') {
+            dropZone.text('Browser Not Supported!');
+            dropZone.addClass('error');
+            return;
+        }
+
+        // Add a nice drag effect
+        dropZone[0].ondragover = function () {
+            dropZone.addClass('hover');
+            return false;
+        };
+
+        // Remove the drag effect when stopping our drag
+        dropZone[0].ondragend = function () {
+            dropZone.removeClass('hover');
+            return false;
+        };
+
+        // The drop event handles the file sending
+        dropZone[0].ondrop = function(event) {
+            // Stop the browser from opening the file in the window
+            event.preventDefault();
+            dropZone.removeClass('hover');
+
+            // Get the file and the file reader
+            var file = event.dataTransfer.files[0];
+
+            if (!isFileExtensionAllowed(file.name)) {
+                //dropZone.text('Invalid File Type!');
+                //dropZone.addClass('error');
+                alert('Invalid File Type!');
+                return;
+            }
+
+            var fileExtension = file.name.split('.').pop().toLowerCase();
+            $('#fileType').val(ToModelFileType(file.name));
+            //$('#fileType').value = ToModelFileType(file.name);
+
+            var reader = new FileReader();
+
+            reader.onload = function (event) {
+                // Получаем содержимое файла в виде текста
+                var fileContent = event.target.result;
+
+                // Здесь вы можете обработать содержимое файла по вашим потребностям
+                dropZone.text(fileContent);
+            };
+
+            reader.readAsText(file);
+    };
+        function isFileExtensionAllowed(fileName) {
+            var allowedExtensions = ['csv', 'json', 'xml'];
+            var fileExtension = fileName.split('.').pop().toLowerCase();
+            return allowedExtensions.includes(fileExtension);
+        }
+
+        function ToModelFileType(fileName){
+            switch (fileName.split('.').pop().toLowerCase()) {
+                case 'csv': return 0;//@FileType.CSV;
+                case 'json': return 1;//@FileType.JSON;
+                case 'xml': return 2;//@FileType.XML;
+                default: return;
+            }
+        }
+    });    
+</script>
+<head>
+    <title>Text input</title>
+    <meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+</head>
+<body>
+    <form method="post" action="/Home/TextSend">
+		<div style="padding-left: 20%; padding-right: 20%; padding-top: 5px">
+			<input class="btn btn-primary" type="submit"></input><br>
+		</div>
+        <div class="input-group mb-3" style="padding-left: 20%; padding-right: 20%; padding-top: 5px">		
+            <input class="form-control" style="width:100%;" placeholder="Введите разделитель при использовании CSV-файлов (по умолчанию ',')" type="text" name="CSVSeparator"></input><br>          
+        </div>
+		<div style="padding-left: 20%; padding-right: 20%; padding-top: 5px">
+			<select class="form-select" id="fileType" name="type">
+				<option selected="true" value="0">CSV</option>
+				<option value="1">JSON</option>
+				<option value="2">XML</option>
+			</select>
+		</div>
+        <div style="padding-left: 20%; padding-right: 20%; padding-top: 5px">
+            <textarea class="form-control" placeholder="Скопируйте текст файла, либо перетащите файл" style="width:100%; height:400px" id="dropZone" name="text"></textarea>
+        </div>
+		<br>
+		<div class="input-group">
+  <div class="input-group-prepend">
+    <span class="input-group-text">With textarea</span>
+  </div>
+  <textarea class="form-control" aria-label="With textarea"></textarea>
+</div>
+    </form>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js" integrity="sha384-fbbOQedDUMZZ5KreZpsbe1LCZPVmfTnH7ois6mU1QK+m14rQ1l2bGBq41eYeM/fS" crossorigin="anonymous"></script>
+</body>
+</html>

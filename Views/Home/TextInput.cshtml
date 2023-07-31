@@ -5,130 +5,34 @@
 <!DOCTYPE html>
 <html>
     <style>
-body
-{
-    font: 12px Arial;
-}
+        body
+        {
+            font: 12px Arial;
+        }
 
-#dropZone
-{
-    border-radius: 5px;
-    border: 2px solid #ccc;
-    background-color: #eee;
-    width: 250px;
-    padding: 50px 0;
-    font-size: 18px;
-    color: #555;
-    margin: 50px auto;
-}
-
-#dropZone.hover
-{
-    border-color: #aaa;
-    background-color: #ddd;
-}
-
-#dropZone.error
-{
-    border-color: #f00;
-    background-color: #faa;
-} 
     </style>
-<script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.6.1.min.js"></script>
 
-<script type="text/javascript">
-    var dropZone;
-
-    // Initializes the dropZone
-    $(document).ready(function () {
-        dropZone = $('#dropZone');
-        dropZone.removeClass('error');
-
-        // Check if window.FileReader exists to make
-        // sure the browser supports file uploads
-        if (typeof(window.FileReader) == 'undefined') {
-            dropZone.text('Browser Not Supported!');
-            dropZone.addClass('error');
-            return;
-        }
-
-        // Add a nice drag effect
-        dropZone[0].ondragover = function () {
-            dropZone.addClass('hover');
-            return false;
-        };
-
-        // Remove the drag effect when stopping our drag
-        dropZone[0].ondragend = function () {
-            dropZone.removeClass('hover');
-            return false;
-        };
-
-        // The drop event handles the file sending
-        dropZone[0].ondrop = function(event) {
-            // Stop the browser from opening the file in the window
-            event.preventDefault();
-            dropZone.removeClass('hover');
-
-            // Get the file and the file reader
-            var file = event.dataTransfer.files[0];
-
-            if (!isFileExtensionAllowed(file.name)) {
-                //dropZone.text('Invalid File Type!');
-                //dropZone.addClass('error');
-                alert('Invalid File Type!');
-                return;
-            }
-
-            var fileExtension = file.name.split('.').pop().toLowerCase();
-            $('#fileType').val(ToModelFileType(file.name));
-            //$('#fileType').value = ToModelFileType(file.name);
-
-            var reader = new FileReader();
-
-            reader.onload = function (event) {
-                // Получаем содержимое файла в виде текста
-                var fileContent = event.target.result;
-
-                // Здесь вы можете обработать содержимое файла по вашим потребностям
-                dropZone.text(fileContent);
-            };
-
-            reader.readAsText(file);
-    };
-        function isFileExtensionAllowed(fileName) {
-            var allowedExtensions = ['csv', 'json', 'xml'];
-            var fileExtension = fileName.split('.').pop().toLowerCase();
-            return allowedExtensions.includes(fileExtension);
-        }
-
-        function ToModelFileType(fileName){
-            switch (fileName.split('.').pop().toLowerCase()) {
-                case 'csv': return 0;//@FileType.CSV;
-                case 'json': return 1;//@FileType.JSON;
-                case 'xml': return 2;//@FileType.XML;
-                default: return;
-            }
-        }
-    });    
-</script>
 <head>
     <title>Text input</title>
     <meta charset="utf-8" />
 </head>
 <body>
     <form method="post" action="/Home/TextSend">
-        <div>
-            <select id="fileType" name="type">
+        <div class="centered">
+            <input class="btn btn-primary" type="submit"></input><br>
+        </div>
+        <div class="input-group mb-3 centered">
+            <input class="form-control" style="width:100%;" placeholder="Введите разделитель при использовании CSV-файлов (по умолчанию ',')" type="text" name="CSVSeparator"></input><br>
+        </div>
+        <div class="centered">
+            <select class="form-select" id="fileType" name="type">
                 <option selected="true" value="0">CSV</option>
                 <option value="1">JSON</option>
                 <option value="2">XML</option>
             </select>
-            <input type="text" name="CSVSeparator"></input>
-            <input type="submit"></input>
         </div>
-        <div>
-            <textarea id="dropZone" name="text"></textarea>
+        <div class="centered">
+            <textarea class="form-control" placeholder="Скопируйте текст файла, либо перетащите файл" style="width:100%; height:400px" id="dropZone" name="text"></textarea>
         </div>
     </form>
 </body>
