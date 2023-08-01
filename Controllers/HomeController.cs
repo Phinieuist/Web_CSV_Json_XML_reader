@@ -58,9 +58,7 @@ namespace Web_CSV_Json_XML_reader.Controllers
 
         public IActionResult JSON()
         {
-            string jsonHTML = JSONReader.ReadJsonForWeb(JToken.Parse(JSONExamlpes.test7));
-
-            return View("JSON", jsonHTML);
+            return View();
         }
 
         

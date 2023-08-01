@@ -94,7 +94,7 @@ namespace Web_CSV_Json_XML_reader.Models
                     switch(val.Type)
                     {
                         case JTokenType.Integer: val.Value = Convert.ToInt32(Request.Form[key]); break;
-                        case JTokenType.Float: val.Value = Convert.ToDouble(Request.Form[key]); break;
+                        case JTokenType.Float: val.Value = Convert.ToDouble(Request.Form[key].ToString().Replace('.', ',')); break;
                         case JTokenType.Boolean: val.Value = Convert.ToBoolean(Request.Form[key]); break;
                         case JTokenType.Date: val.Value = Convert.ToDateTime(Request.Form[key]); break;
                         case JTokenType.String: val.Value = Convert.ToString(Request.Form[key]); break;

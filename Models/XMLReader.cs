@@ -17,14 +17,18 @@ namespace Web_CSV_Json_XML_reader.Models
             return ProcessNode(rootNode, 0);
         }
 
-        static string ProcessNode(XmlNode node, int level)
+        private static string ProcessNode(XmlNode node, int level, bool arr = false, int arrNum = 0)
         {
             StringBuilder sb = new StringBuilder();
 
             if (node.NodeType == XmlNodeType.Element)
             {
                 string type = "text";
-                sb.Append($"<details><summary>&lt;{node.Name}&gt;</summary>");
+                //sb.Append($"<p><button class='btn btn-primary' type='button' data-bs-toggle='collapse' data-bs-target='#ID_{node.Name}_{(arr == true ? arrNum : "")}' aria-expanded='false' aria-controls='ID_{node.Name}_{(arr == true ? arrNum : "")}'>Object [{node.Name}]</button></p>");
+                //sb.Append($"<div class='collapse' id='ID_{node.Name}_{(arr == true ? arrNum : "")}'>");
+                sb.Append($"<p><button class='btn btn-primary' type='button' data-bs-toggle='collapse' data-bs-target='#ID_{FindXPath(node)}' aria-expanded='false' aria-controls='ID_{FindXPath(node)}'>Object [{node.Name}]</button></p>");
+                sb.Append($"<div class='collapse' id='ID_{FindXPath(node)}'>");
+                //sb.Append($"<details><summary>&lt;{node.Name}&gt;</summary>");
 
                 if (node.Attributes != null)
                 {
@@ -32,7 +36,7 @@ namespace Web_CSV_Json_XML_reader.Models
                     foreach (XmlAttribute attribute in node.Attributes)
                     {
                         //sb.Append($"<li>{attribute.Name} : <input type='{type}' name='{FindXPath(attribute)}' value='{attribute.Value}'/></li>");
-                        sb.Append($"<li><div class=\"input-group mb-3\"><div class=\"input-group-prepend\"><span class=\"input-group-text\">{attribute.Name}</span></div> <textarea name='{FindXPath(attribute)}' class=\"form-control textInp\">{attribute.Value}</textarea></div></li>");
+                        sb.Append($"<li><div class='input-group mb-3'><div class='input-group-prepend'><span class='input-group-text'>{attribute.Name}</span></div> <textarea name='{FindXPath(attribute)}' class='form-control textInp'>{attribute.Value}</textarea></div></li>");
                     }
 
                     sb.Append("</ul>");
@@ -44,18 +48,18 @@ namespace Web_CSV_Json_XML_reader.Models
                     for (int i = 0; i < node.ChildNodes.Count; i++)
                     {
                         sb.Append("<li>");
-                        sb.Append(ProcessNode(node.ChildNodes[i], level + 1));
+                        sb.Append(ProcessNode(node.ChildNodes[i], level + 1, true, i));
                         sb.Append("</li>");
                     }
                     sb.Append("</ul>");
                 }
-
-                sb.Append("</details>");
+                sb.Append("</div>");
+                // sb.Append("</details>");
             }
             else if (node.NodeType == XmlNodeType.Text)
             {
                 //sb.Append($"<p>{new string(' ', level * 4)} <input class=\"form-control\" type='text' name='{FindXPath(node)}' value='{node.InnerText}' /></p>");
-                sb.Append($"<p>{new string(' ', level * 4)} <textarea name='{FindXPath(node)}' class=\"form-control mb-3 textInp\">{node.InnerText}</textarea></p>");
+                sb.Append($"<p>{new string(' ', level * 4)} <textarea name='{FindXPath(node)}' class='form-control mb-3 textInp'>{node.InnerText}</textarea></p>");
             }
 
             return sb.ToString();
