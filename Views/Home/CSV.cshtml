@@ -13,11 +13,11 @@
     <meta charset="utf-8" />
 </head>
 <body>
-    <form method="post" action="/Home/csvsave">
+    <form method="post" action="/Home/CSVsave">
         <div class="centered">
             <div class="card card-body">
                 <div class="btn-group mb-3" role="group">
-                    <a class="btn btn-secondary" href="/home/TextInput">Вернуться на главную</a>
+                    <a class="btn btn-secondary" href="/home/Index">Вернуться на главную</a>
                     <input class="btn btn-secondary" type="submit" value="Сохранить изменения" />
                 </div>
                 <div class="input-group mb-3">
@@ -35,27 +35,27 @@
             </div>
         </div>
         <br />
-        <div>
+        <div class="div-for-raw">
             <div class="card card-body">
-                <table border="1" cellpadding="1" cellspacing="1" align="center">
-                    @foreach (string[] line in Model.Data)
-                    {
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        @foreach (string[] line in Model.Data)
+                        {
+                            <tr>
+                                @foreach (string cell in line)
+                                {
+                                    <td><input class="form-control" name="cell[@i,@j]" value="@cell"></td>
+                                    j++;
+                                }
 
-                        <tr>
-                            @foreach (string cell in line)
-                            {
-                                <td><input name="cell[@i,@j]" value="@cell"></td>
-                                j++;
-                            }
-
-                        </tr>
-                        i++;
-                        j = 0;
-                    }
-                    <input type="hidden" value="@Model.Data[0].Length" name="j_lenght">
-                    <input type="hidden" value="@Model.Data.Count" name="i_lenght">
-
-                </table>
+                            </tr>
+                            i++;
+                            j = 0;
+                        }
+                        <input type="hidden" value="@Model.Data[0].Length" name="j_lenght">
+                        <input type="hidden" value="@Model.Data.Count" name="i_lenght">
+                    </table>
+                </div>
             </div>
         </div>
     </form>   

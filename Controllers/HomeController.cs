@@ -24,19 +24,6 @@ namespace Web_CSV_Json_XML_reader.Controllers
             return View();
         }
 
-        public string TestIn()
-        {
-            string text = Request.Query["text"];
-            return "Inputted text: " + text;
-        }
-
-        public IActionResult csvtest()
-        {
-            //CSVDataTable dataTable = CSVReader.Read(CSVExample.Diabets, ",");
-            CSVDataTable dataTable = CSVReader.TFPRead(CSVExample.DiabetsFile);
-            return View("test", dataTable);
-        }
-
         public ActionResult DownloadFile(string filePath, string downloadFileName)
         {
             string contentType = "text/plain";
@@ -50,83 +37,80 @@ namespace Web_CSV_Json_XML_reader.Controllers
         }
 
         [HttpPost]
-        public IActionResult csvsave()
+        public IActionResult TextSend(TextInputViewModel model)
         {
-            return DownloadFile(FileSaver.SaveCSV(Request), FileSaver.GetFileName(FileType.CSV, Request.Form["Name"].ToString()));
-        }
+            try
+            {
+                if (string.IsNullOrEmpty(model.Name))
+                    model.Name = "WebInput";
 
+                string rawHTML;
 
-        public IActionResult JSON()
-        {
-            return View();
-        }
+                switch (model.Type)
+                {
+                    case FileType.CSV:
+                        return View("CSV", CSVReader.TFPRead(model.Text, model.Name, model.CSVSeparator));
 
-        
-        public IActionResult TextInput()
-        {
-            return View();
+                    case FileType.XML:
+                        XmlDocument xmlD;
+                        rawHTML = XMLReader.Read(model.Text, out xmlD);
+                        return View("XML", new XMLViewModel(rawHTML, xmlD, model.Name));
+
+                    case FileType.JSON:
+                        JToken token;
+                        rawHTML = JSONReader.ReadForWeb(model.Text, out token);
+                        return View("JSON", new JSONViewModel(token, rawHTML, model.Name));
+                }
+
+                return View("TextInput");
+            }
+            catch (Exception ex)
+            {
+                return View("_Error", ex.Message);
+            }
         }
 
         [HttpPost]
-        public IActionResult TextSend(TextInputViewModel model)
+        public IActionResult CSVsave()
         {
-            if (string.IsNullOrEmpty(model.Name))
-                model.Name = "WebInput";
-
-            switch (model.Type)
+            try
             {
-                case FileType.CSV:
-                    string separator;
-                    if (string.IsNullOrEmpty(model.CSVSeparator)) separator = ",";
-                    else separator = model.CSVSeparator;
-
-                    CSVDataTable dataTable = CSVReader.TFPReadText(model.Text, model.Name, separator);
-                    dataTable.Separator = model.CSVSeparator;
-                    dataTable.Name = model.Name;
-
-                    return View("test", dataTable);
-                
-                case FileType.XML:
-                    XmlDocument xmlDoc = new XmlDocument();
-                    xmlDoc.LoadXml(model.Text);
-
-                    return View("XML", new XMLViewModel(xmlDoc, XMLReader.Read(xmlDoc), model.Name));
-                
-                case FileType.JSON:
-                    JToken token = JToken.Parse(model.Text);
-                    return View("JSON", new JSONViewModel(token, JSONReader.ReadJsonForWeb(token), model.Name));
+                return DownloadFile(FileSaver.SaveCSV(Request), FileSaver.GetFileName(FileType.CSV, Request.Form["Name"].ToString()));
             }
-
-            return View("TextInput");
+            catch (Exception ex)
+            {
+                return View("_Error", ex.Message);
+            }
         }
 
+        [HttpPost]
         public IActionResult JSONSave(JSONViewModel model)
         {
-            model.Data = JToken.Parse(Request.Form["Data"]);
-            return DownloadFile(FileSaver.SaveJSON(model.Data, Request), FileSaver.GetFileName(FileType.JSON, model.Name));
+            try
+            {
+                model.Data = JToken.Parse(Request.Form["Data"]);
+                return DownloadFile(FileSaver.SaveJSON(model.Data, Request), FileSaver.GetFileName(FileType.JSON, model.Name));
+            }
+            catch (Exception ex)
+            {
+                return View("_Error", ex.Message);
+            }
         }
 
+        [HttpPost]
         public IActionResult XMLSave(XMLViewModel model)
         {
-            model.Data = new XmlDocument();
-            model.Data.LoadXml(Request.Form["Data"]);
+            try
+            {
+                model.Data = new XmlDocument();
+                model.Data.LoadXml(Request.Form["Data"]);
 
-            return DownloadFile(FileSaver.SaveXML(model, Request), FileSaver.GetFileName(FileType.XML, model.Name));
-        }
-
-        public IActionResult test()
-        {
-            return View("FileSave");
-        }
-
-        public object FileSave()
-        {
-            return Request.Form["FileType"].ToString();
-        }
-
-        public IActionResult Privacy()
-        {
-            return View();
+                return DownloadFile(FileSaver.SaveXML(model, Request), FileSaver.GetFileName(FileType.XML, model.Name));
+            }
+            catch (Exception ex)
+            {
+                return View("_Error", ex.Message);
+            }
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

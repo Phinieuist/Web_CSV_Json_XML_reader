@@ -1,16 +1,10 @@
 ﻿using Microsoft.VisualBasic.FileIO;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Text;
+using System.Reflection;
 
 namespace Web_CSV_Json_XML_reader.Models
 {
- 
-    public class CSVExample
-    {
-        public static string DiabetsFile => @"C:\Users\user\Desktop\2\универ\магистратура\1 курс 2 семестр\Интеллектуальный анализ данных\Сем2\diabetesShort.csv";
-        public static string Diabets { get => File.ReadAllText(@"C:\Users\user\Desktop\2\универ\магистратура\1 курс 2 семестр\Интеллектуальный анализ данных\Сем2\diabetesShort.csv"); }
-    }
-
     public class CSVReader
     {
         public static CSVDataTable Read(string input, string separator)
@@ -28,32 +22,55 @@ namespace Web_CSV_Json_XML_reader.Models
             return new CSVDataTable(Columns);
         }
 
-        public static CSVDataTable TFPReadText(string csvtext, string outputName = "temp", string separator = ",")
+        public static CSVDataTable TFPReadText(string csvtext, string outputName, string separator = ",")
         {
-            List<string[]> result = new List<string[]>();
-
-            StringReader stringReader = new StringReader(csvtext);
-            using (TextFieldParser parser = new TextFieldParser(stringReader))
+            try
             {
-                parser.TextFieldType = FieldType.Delimited;
-                parser.SetDelimiters(separator);
-                while (!parser.EndOfData)
+                List<string[]> result = new List<string[]>();
+
+                StringReader stringReader = new StringReader(csvtext);
+                using (TextFieldParser parser = new TextFieldParser(stringReader))
                 {
-                    string[] fields = parser.ReadFields();
-                    result.Add(fields);
+                    parser.TextFieldType = FieldType.Delimited;
+                    parser.SetDelimiters(separator);
+                    while (!parser.EndOfData)
+                    {
+                        string[] fields = parser.ReadFields();
+                        result.Add(fields);
+                    }
                 }
+
+                return new CSVDataTable(result, outputName);
             }
-
-            return new CSVDataTable(result, outputName);
+            catch (MalformedLineException ex)
+            {
+                string[] exMessage = ex.Message.Split(' ');
+                throw new Exception($"Строка {exMessage[1]}. Неверный разделитель. (\"{separator}\")");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
-        public static CSVDataTable TFPRead(string filePath, string separator = ",")
+        public static CSVDataTable TFPRead(string csvtext, string outputName, string separator)
         {
-            string text = File.ReadAllText(filePath);
-            TFPRead(text, Path.GetFileName(filePath));
+            try
+            {
+                if (string.IsNullOrEmpty(separator))
+                    separator = ",";
 
-            return TFPReadText(text, Path.GetFileName(filePath), separator);
+
+                CSVDataTable dataTable = TFPReadText(csvtext, outputName, separator);
+                dataTable.Separator = separator;
+                dataTable.Name = outputName;
+
+                return dataTable;
+            }
+            catch(Exception ex)
+            {
+                throw new Exception("Ошибка в процессе чтения CSV-документа. " + ex.Message);
+            }          
         }
-
     }
 }

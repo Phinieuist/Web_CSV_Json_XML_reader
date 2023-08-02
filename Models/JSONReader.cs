@@ -9,8 +9,21 @@ namespace Web_CSV_Json_XML_reader.Models
 {
     public class JSONReader
     {
+        public static string ReadForWeb(string text, out JToken token)
+        {
+            try
+            {
+                token = JToken.Parse(text);
+                return ReadJsonForWeb(token);
+            }
+            catch(Exception ex)
+            {
+                throw new Exception("Ошибка в процессе чтения JSON-документа. " + ex.Message);
+            }
+        }
+
         // рекурсивная функция для обработки JSON-элементов и вывода на веб-страницу
-        public static string ReadJsonForWeb(JToken token, string prefix = "")
+        private static string ReadJsonForWeb(JToken token, string prefix = "")
         {
             if (token is JValue)
             {
@@ -43,9 +56,6 @@ namespace Web_CSV_Json_XML_reader.Models
                             varFalse = "selected";
 
                         output = $"<select name='{name}' class='custom-select'> <option {varTrue} value='true'>true</option> <option {varFalse} value='false'>false</option> </select>";
-
-
-                        //output = $"<input type='checkbox' {addition} name='{name}' value='{val.Value}'/>";
                         break;
                     case JTokenType.Date:
                         output = $"<input type='datetime-local' name='{name}' value='{val.Value}'/>";
@@ -55,28 +65,6 @@ namespace Web_CSV_Json_XML_reader.Models
                 }
 
                 return output;
-
-                //if (val.Type == JTokenType.String)
-                //{
-                //    return $"<textarea name='{name}' class=\"form-control textInp\">{val.Value}</textarea>";
-                //}
-                //else if (val.Type == JTokenType.Integer || val.Type == JTokenType.Float)
-                //{
-                //    type = "number";
-                //}
-                //else if (val.Type == JTokenType.Boolean)
-                //{
-                //    type = "checkbox";
-                //    if ((bool)val.Value)
-                //        addition = "checked";
-
-                //    //return $"<input type='{type}' class=\"btn-check\" id=\"ID_{name}\" {addition} name='{name}' value='{val.Value}' autocomplete=\"off\"/><label class=\"btn btn-outline-primary\" for=\"ID_{name}\">___</label>";
-                //}
-                //else if (val.Type == JTokenType.Date)
-                //{
-                //    type = "datetime-local";
-                //}
-                //return $"{tag}<input type='{type}' {addition} name='{name}' value='{val.Value}'/>{(tag!=""?tag.Insert(1, "/"):"")}";
             }
             else if (token is JArray)
             {
@@ -123,7 +111,7 @@ namespace Web_CSV_Json_XML_reader.Models
             else
             {
                 // в случае неизвестного типа элемента, выбрасываем исключение
-                throw new Exception("Unknown JSON element type");
+                throw new Exception("Неизвестный JSON элемент.");
             }
         }
     }
