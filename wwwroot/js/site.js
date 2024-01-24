@@ -55,6 +55,7 @@ $(document).ready(function () {
         }
 
         var fileExtension = file.name.split('.').pop().toLowerCase();
+        $('#fileName').val(file.name.split('.')[0]);
         $('#fileType').val(ToModelFileType(file.name));
         //$('#fileType').value = ToModelFileType(file.name);
 

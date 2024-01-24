@@ -1,13 +1,36 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
+﻿@using Web_CSV_Json_XML_reader.Models
+@using Web_CSV_Json_XML_reader.Controllers
+@model TextInputViewModel;
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-    <p>CSV Test <a href="/home/csvtest">HERE</a></p>
-    <p>JSON Test <a href="/home/jsontest">HERE</a></p>
-    <p>JSON Test 2 <a href="/home/JSON">HERE</a></p>
-    <p>Text input <a href="/home/TextInput">HERE</a></p>
-    
-</div>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CSV | JSON | XML Reader</title>
+    <meta charset="utf-8" />
+</head>
+<body>
+    <form method="post" action="/Home/TextSend">
+        <div class="centered">
+            <div class="card card-body">
+                <div class="div-for-raw">
+                    <input class="btn btn-primary" type="submit" value="Продолжить" /><br>
+                </div>
+                <div class="input-group mb-3 div-for-raw">
+                    <input class="form-control" style="width:100%;" placeholder="Введите разделитель при использовании CSV-файлов (по умолчанию ',')" type="text" name="CSVSeparator"></input><br>
+                </div>
+                <div class="div-for-raw">
+                    <select class="form-select" id="fileType" name="type">
+                        <option selected="true" value="0">CSV</option>
+                        <option value="1">JSON</option>
+                        <option value="2">XML</option>
+                    </select>
+                </div>
+                <div class="div-for-raw">
+                    <textarea class="form-control" placeholder="Скопируйте текст файла, либо перетащите файл" style="width:100%; height:400px" id="dropZone" name="text"></textarea>
+                </div>
+                <input type="hidden" name="name" id="fileName" value="" />
+            </div>
+        </div>
+    </form>
+</body>
+</html>

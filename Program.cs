@@ -38,8 +38,11 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
+
     pattern: "{controller=Home}/{action=TextInput}/{id?}");
     //pattern: "{controller=Account}/{action=Index3}/{id?}");
+
+
 
 app.Run();
 

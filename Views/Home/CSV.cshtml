@@ -1,0 +1,63 @@
+﻿@using Web_CSV_Json_XML_reader.Models
+@using Web_CSV_Json_XML_reader.Controllers
+@model CSVDataTable;
+@{
+    int i = 0;
+    int j = 0;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CSV Viewer | File: @Model.Name</title>
+    <meta charset="utf-8" />
+</head>
+<body>
+    <form method="post" action="/Home/CSVsave">
+        <div class="centered">
+            <div class="card card-body">
+                <div class="btn-group mb-3" role="group">
+                    <a class="btn btn-secondary" href="/home/Index">Вернуться на главную</a>
+                    <input class="btn btn-secondary" type="submit" value="Сохранить изменения" />
+                </div>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Название файла:</span>
+                    </div>
+                    <input type="text" class="form-control" aria-describedby="basic-addon3" name="Name" value="@Model.Name" />
+                </div>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Разделитель файла:</span>
+                    </div>
+                    <input type="text" class="form-control" aria-describedby="basic-addon3" name="Separator" value="@Model.Separator" placeholder="Введите разделитель для сохранения CSV-файла (по умолчанию ',')" />
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="div-for-raw">
+            <div class="card card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        @foreach (string[] line in Model.Data)
+                        {
+                            <tr>
+                                @foreach (string cell in line)
+                                {
+                                    <td><input class="form-control" name="cell[@i,@j]" value="@cell"></td>
+                                    j++;
+                                }
+
+                            </tr>
+                            i++;
+                            j = 0;
+                        }
+                        <input type="hidden" value="@Model.Data[0].Length" name="j_lenght">
+                        <input type="hidden" value="@Model.Data.Count" name="i_lenght">
+                    </table>
+                </div>
+            </div>
+        </div>
+    </form>   
+</body>
+</html>

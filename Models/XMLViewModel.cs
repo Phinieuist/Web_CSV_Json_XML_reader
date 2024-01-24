@@ -16,13 +16,13 @@ namespace Web_CSV_Json_XML_reader.Models
             Data = data;
         }
 
-        public XMLViewModel(XmlDocument data, string RawHTML)
+        public XMLViewModel(string RawHTML, XmlDocument data)
         {
             Data = data;
             this.RawHTML = RawHTML;
         }
 
-        public XMLViewModel(XmlDocument data, string RawHTML, string Name)
+        public XMLViewModel(string RawHTML, XmlDocument data, string Name)
         {
             Data = data;
             this.RawHTML = RawHTML;

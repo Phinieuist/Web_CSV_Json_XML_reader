@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Primitives;
 using System;
+using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -10,29 +11,39 @@ namespace Web_CSV_Json_XML_reader.Models
 {
     public class XMLReader
     {
-        public static string Read(XmlDocument xmlDocument)
+        public static string Read(string xmlDocument, out XmlDocument xmlD)
         {
-            XmlNode rootNode = xmlDocument.DocumentElement;
+            try
+            {
+                XmlDocument xmlDoc = new XmlDocument();
+                xmlDoc.LoadXml(xmlDocument);
+                xmlD = xmlDoc;
 
-            return ProcessNode(rootNode, 0);
+                XmlNode rootNode = xmlDoc.DocumentElement;
+
+                return ProcessNode(rootNode, 0);
+            }
+            catch(Exception ex)
+            {
+                throw new Exception("Ошибка в процессе чтения XML-документа. " + ex.Message);
+            }
         }
 
-        static string ProcessNode(XmlNode node, int level)
+        private static string ProcessNode(XmlNode node, int level)
         {
             StringBuilder sb = new StringBuilder();
 
             if (node.NodeType == XmlNodeType.Element)
             {
-                string type = "text";
-                sb.Append($"<details><summary>&lt;{node.Name}&gt;</summary>");
+                sb.Append($"<p><button class='btn btn-primary' type='button' data-bs-toggle='collapse' data-bs-target='#ID_{FindXPath(node)}' aria-expanded='false' aria-controls='ID_{FindXPath(node)}'>Object [{node.Name}]</button></p>");
+                sb.Append($"<div class='collapse' id='ID_{FindXPath(node)}'>");
 
                 if (node.Attributes != null)
                 {
                     sb.Append("<ul>");
                     foreach (XmlAttribute attribute in node.Attributes)
                     {
-                        //sb.Append($"<li>{attribute.Name} : <input type='{type}' name='{FindXPath(attribute)}' value='{attribute.Value}'/></li>");
-                        sb.Append($"<li><div class=\"input-group mb-3\"><div class=\"input-group-prepend\"><span class=\"input-group-text\">{attribute.Name}</span></div> <textarea name='{FindXPath(attribute)}' class=\"form-control textInp\">{attribute.Value}</textarea></div></li>");
+                        sb.Append($"<li><div class='input-group mb-3'><div class='input-group-prepend'><span class='input-group-text'>{attribute.Name}</span></div> <textarea name='{FindXPath(attribute)}' class='form-control textInp'>{attribute.Value}</textarea></div></li>");
                     }
 
                     sb.Append("</ul>");
@@ -49,13 +60,11 @@ namespace Web_CSV_Json_XML_reader.Models
                     }
                     sb.Append("</ul>");
                 }
-
-                sb.Append("</details>");
+                sb.Append("</div>");
             }
             else if (node.NodeType == XmlNodeType.Text)
             {
-                //sb.Append($"<p>{new string(' ', level * 4)} <input class=\"form-control\" type='text' name='{FindXPath(node)}' value='{node.InnerText}' /></p>");
-                sb.Append($"<p>{new string(' ', level * 4)} <textarea name='{FindXPath(node)}' class=\"form-control mb-3 textInp\">{node.InnerText}</textarea></p>");
+                sb.Append($"<p><textarea name='{FindXPath(node)}' class='form-control mb-3 textInp'>{node.InnerText}</textarea></p>");
             }
 
             return sb.ToString();
@@ -84,10 +93,10 @@ namespace Web_CSV_Json_XML_reader.Models
                     case XmlNodeType.Document:
                         return builder.ToString();                  
                     default:
-                        throw new ArgumentException("Only elements and attributes are supported");
+                        throw new ArgumentException("Поддерживаются только элементы и атрибуты");
                 }
             }
-            throw new ArgumentException("Node was not in a document");
+            throw new ArgumentException("Узел не найден в документе");
         }
 
         private static int FindElementIndex(XmlElement element)
@@ -110,7 +119,7 @@ namespace Web_CSV_Json_XML_reader.Models
                     index++;
                 }
             }
-            throw new ArgumentException("Couldn't find element within parent");
+            throw new ArgumentException("Индекс не найден");
         }
 
         public XMLReader() { }

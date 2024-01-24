@@ -5,21 +5,26 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>XML Viewer</title>
+    <title>XML Viewer | File: @Model.Name</title>
 </head>
 <body>
     <form method="POST" action="/Home/XMLSave">
         <div class="centered">
-            <input class="btn btn-primary" type="submit" value="Save" /><br />
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">Название файла:</span>
+            <div class="card card-body">
+                <div class="btn-group mb-3" role="group">
+                    <a class="btn btn-secondary" href="/home/Index">Вернуться на главную</a>
+                    <input class="btn btn-secondary" type="submit" value="Сохранить изменения" />
                 </div>
-                <input type="text" class="form-control" aria-describedby="basic-addon3" name="Name" value="@Model.Name" />
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Название файла:</span>
+                    </div>
+                    <input type="text" class="form-control" aria-describedby="basic-addon3" name="Name" value="@Model.Name" />
+                </div>
             </div>
         </div>
         <div class="div-for-raw">
-            <div>
+            <div class="card card-body">
                 @Html.Raw(Model.RawHTML)
             </div>
         </div>
