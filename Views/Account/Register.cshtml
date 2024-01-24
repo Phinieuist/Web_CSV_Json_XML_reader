@@ -1,0 +1,24 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title>Регистрация</title>
+</head>
+<body>
+    <h2 class="centered">Регистрация на сайте</h2>
+    <form method="post" action="/Account/RegisterNew">
+        <div class="input-group mb-3 centered">
+            <input class="form-control" style="width:100%;" placeholder="Введите ваш Email" type="text" name="email" /><br>
+        </div>
+        <div class="input-group mb-3 centered">
+            <input class="form-control" style="width:100%;" placeholder="Введите ваш пароль" type="password" name="password" /><br>
+        </div>
+        <div class="input-group mb-3 centered">
+            <input class="form-control" style="width:100%;" placeholder="Повторите ваш пароль" type="password" name="passwordRepeat" /><br>
+        </div>
+        <div class="centered">
+            <input class="btn btn-primary" type="submit" value="Зарегистрироваться" /><br>
+        </div>
+    </form>
+</body>
+</html>
