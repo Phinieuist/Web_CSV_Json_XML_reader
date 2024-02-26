@@ -1,6 +1,110 @@
-﻿@using Web_CSV_Json_XML_reader.Models
-@using Web_CSV_Json_XML_reader.Controllers
+﻿@using Web_CSV_Json_XML_reader.ViewModels;
+@using Web_CSV_Json_XML_reader.Controllers;
+@using System.Xml;
+@using System.Text;
+    
 @model XMLViewModel;
+
+@functions{
+    void ParseXMLNode(XmlNode node, int level)
+    {
+        @if (node.NodeType == XmlNodeType.Element)
+        {
+            <p>
+                <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#ID_@FindXPath(node)" aria-expanded="false" aria-controls="ID_@FindXPath(node)">Object [@node.Name]</button>
+            </p>
+            <div class="collapse" id="ID_@FindXPath(node)">
+
+                @if (node.Attributes != null)
+                {
+                    <ul>
+                        @foreach (XmlAttribute attr in node.Attributes)
+                        {
+                            <li>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">@attr.Name</span>
+                                    </div> 
+                                    <textarea name="@FindXPath(attr)" class="form-control textInp">@attr.Value</textarea>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                }
+
+                @if (node.HasChildNodes)
+                {
+                    <ul>
+                        @for (int i = 0; i < node.ChildNodes.Count; i++)
+                        {
+                            <li>
+                                @{ParseXMLNode(node.ChildNodes[i], level + 1);}
+                    </li>
+                }
+                </ul>
+            }
+            </div>
+        }
+        else if (node.NodeType == XmlNodeType.Text)
+        {
+            <p>
+            <textarea name="@FindXPath(node)" class="form-control mb-3 textInp">@node.InnerText</textarea>
+            </p>
+        }
+    }
+
+    string FindXPath(XmlNode node)
+    {
+        StringBuilder builder = new StringBuilder();
+        while (node != null)
+        {
+            switch (node.NodeType)
+            {
+                case XmlNodeType.Attribute:
+                    builder.Insert(0, "/@" + node.Name);
+                    node = ((XmlAttribute)node).OwnerElement;
+                    break;
+                case XmlNodeType.Element:
+                    int index = FindElementIndex((XmlElement)node);
+                    builder.Insert(0, "/" + node.Name + "[" + index + "]");
+                    node = node.ParentNode;
+                    break;
+                case XmlNodeType.Text:
+                    builder.Insert(0, "");
+                    node = node.ParentNode;
+                    break;
+                case XmlNodeType.Document:
+                    return builder.ToString();
+                default:
+                    throw new ArgumentException("Поддерживаются только элементы и атрибуты");
+            }
+        }
+        throw new ArgumentException("Узел не найден в документе");
+    }
+
+    int FindElementIndex(XmlElement element)
+    {
+        XmlNode parentNode = element.ParentNode;
+        if (parentNode is XmlDocument)
+        {
+            return 1;
+        }
+        XmlElement parent = (XmlElement)parentNode;
+        int index = 1;
+        foreach (XmlNode candidate in parent.ChildNodes)
+        {
+            if (candidate is XmlElement && candidate.Name == element.Name)
+            {
+                if (candidate == element)
+                {
+                    return index;
+                }
+                index++;
+            }
+        }
+        throw new ArgumentException("Индекс не найден");
+    }
+}
 
 <!DOCTYPE html>
 <html>
@@ -8,12 +112,12 @@
     <title>XML Viewer | File: @Model.Name</title>
 </head>
 <body>
-    <form method="POST" action="/Home/XMLSave">
+    <form method="POST">
         <div class="centered">
             <div class="card card-body">
                 <div class="btn-group mb-3" role="group">
-                    <a class="btn btn-secondary" href="/home/Index">Вернуться на главную</a>
-                    <input class="btn btn-secondary" type="submit" value="Сохранить изменения" />
+                    <input class="btn btn-secondary" type="submit" formaction="/Home/XMLDownload" value="Скачать файл" />
+                    <input class="btn btn-secondary" type="submit" formaction="/Account/XMLSave" value="Сохранить файл" />
                 </div>
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
@@ -23,12 +127,19 @@
                 </div>
             </div>
         </div>
-        <div class="div-for-raw">
+        @*<div class="div-for-raw">
             <div class="card card-body">
                 @Html.Raw(Model.RawHTML)
             </div>
+        </div>*@
+        <div class="div-for-raw">
+            <div class="card card-body">
+                @{ParseXMLNode(Model.Data.DocumentElement, 0);}
+            </div>
         </div>
         <input type="hidden" value="@Model.Data.OuterXml" name="Data" />
+        <input type="hidden" value="@Model.IsExistsInDB.ToString()" name="IsExistsInDB" />
+        <input type="hidden" value="@Model.FileId.ToString()" name="FileId" />
     </form>
 </body>
 </html>

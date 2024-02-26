@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Web_CSV_Json_XML_reader.Entities
+namespace Web_CSV_Json_XML_reader.Data.DB.Entities
 {
     public class User
     {
@@ -20,6 +20,13 @@ namespace Web_CSV_Json_XML_reader.Entities
             this.UserId = UserId;
             this.Email = Email;
             this.Password = Password;
+        }
+
+        public User(User user)
+        {
+            UserId = user.UserId;
+            Email = user.Email;
+            Password = user.Password;
         }
     }
 }

@@ -7,6 +7,7 @@ using System.Runtime.InteropServices.JavaScript;
 using System.Text;
 using System.Xml.Linq;
 using System.Xml;
+using Web_CSV_Json_XML_reader.ViewModels;
 
 namespace Web_CSV_Json_XML_reader.Models
 {
@@ -86,7 +87,7 @@ namespace Web_CSV_Json_XML_reader.Models
             }
             catch(Exception ex)
             {
-                throw new Exception($"Ошибка при сохранении CSV-файла. {ex.Message}");
+                throw new Exception($"Ошибка при сохранении CSV-файла. {ex.Message}", ex);
             }
         }
 
@@ -123,7 +124,7 @@ namespace Web_CSV_Json_XML_reader.Models
             }
             catch (Exception ex)
             {
-                throw new Exception($"Ошибка при сохранении JSON-файла. {ex.Message}");
+                throw new Exception($"Ошибка при сохранении JSON-файла. {ex.Message}", ex);
             }
         }
 
@@ -178,7 +179,7 @@ namespace Web_CSV_Json_XML_reader.Models
             }
             catch (Exception ex)
             {
-                throw new Exception($"Ошибка при сохранении XML-файла. {ex.Message}");
+                throw new Exception($"Ошибка при сохранении XML-файла. {ex.Message}", ex);
             }
         }
     }

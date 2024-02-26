@@ -1,5 +1,5 @@
-﻿@using Web_CSV_Json_XML_reader.Models
-@using Web_CSV_Json_XML_reader.Controllers
+﻿@using Web_CSV_Json_XML_reader.ViewModels;
+@using Web_CSV_Json_XML_reader.Controllers;
 @model CSVDataTable;
 @{
     int i = 0;
@@ -13,12 +13,12 @@
     <meta charset="utf-8" />
 </head>
 <body>
-    <form method="post" action="/Home/CSVsave">
+    <form method="post">
         <div class="centered">
             <div class="card card-body">
                 <div class="btn-group mb-3" role="group">
-                    <a class="btn btn-secondary" href="/home/Index">Вернуться на главную</a>
-                    <input class="btn btn-secondary" type="submit" value="Сохранить изменения" />
+                    <input class="btn btn-secondary" type="submit" formaction="/Home/CSVDownload" value="Скачать файл" />
+                    <input class="btn btn-secondary" type="submit" formaction="/Account/CSVSave" value="Сохранить файл" />
                 </div>
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
@@ -54,6 +54,8 @@
                         }
                         <input type="hidden" value="@Model.Data[0].Length" name="j_lenght">
                         <input type="hidden" value="@Model.Data.Count" name="i_lenght">
+                        <input type="hidden" value="@Model.IsExistsInDB.ToString()" name="IsExistsInDB" />
+                        <input type="hidden" value="@Model.FileId.ToString()" name="FileId" />
                     </table>
                 </div>
             </div>

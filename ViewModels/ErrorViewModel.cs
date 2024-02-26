@@ -1,4 +1,4 @@
-namespace Web_CSV_Json_XML_reader.Models
+namespace Web_CSV_Json_XML_reader.ViewModels
 {
     public class ErrorViewModel
     {

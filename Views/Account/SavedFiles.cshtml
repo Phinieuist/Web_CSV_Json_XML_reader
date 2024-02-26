@@ -1,0 +1,87 @@
+﻿@using Web_CSV_Json_XML_reader.Data.DB.Entities;
+@using Web_CSV_Json_XML_reader.Controllers;
+@model IReadOnlyCollection<File>;
+
+@functions
+{
+    public string GetName(string name)
+    {
+        string extension = System.IO.Path.GetExtension(name);
+        if (extension == ".csv")
+        {
+            string[] parts = System.IO.Path.GetFileNameWithoutExtension(name).Split("%sep%");
+
+            if (parts.Length == 2)
+            {
+                return string.Concat(parts[0], ".csv");
+            }
+            else
+            {
+                return string.Concat(string.Join("%sep%", parts.SkipLast(1).ToArray()), ".csv");
+            }
+        }
+        else
+        {
+            return name;
+        }
+    }
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Saved files</title>
+    <meta charset="utf-8" />
+</head>
+<body>
+    <div class="centered">
+        <div class="card card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <tr>
+                        <td>Название файла</td>
+                        <td>Дата последнего изменения файла</td>
+                        <td>Действия</td>
+                    </tr>
+                    @foreach (File file in Model)
+                    {
+                        <tr>
+                            <td>@GetName(file.FileName)</td>
+                            <td>@file.LastChanged.ToString()</td>
+                            <td>
+                                <div class="btn-group mb-3" role="group">
+                                    <form>
+                                        <input type="hidden" name="FileId" value="@file.FileId" />
+                                        <input class="btn btn-secondary" type="submit" formaction="/Account/OpenFile" formmethod="get" style="background-color:lawngreen" value="Просмотреть" />
+                                        <input class="btn btn-secondary" type="submit" formaction="/Account/DeleteFile" formmethod="post" style="background-color:orangered" value="Удалить" />
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+    @* <form method="POST" action="/Account/JSONSave">
+    <div class="centered">
+    <div class="card card-body">
+    <div class="btn-group mb-3" role="group">
+    <a class="btn btn-secondary" href="/home/Index">Вернуться на главную</a>
+    <input class="btn btn-secondary" type="submit" value="Сохранить изменения" />
+    </div>
+    <div class="input-group mb-3">
+    <div class="input-group-prepend">
+    <span class="input-group-text">Название файла:</span>
+    </div>
+    <input type="text" class="form-control" aria-describedby="basic-addon3" name="Name" value="@Model.Name" />
+    </div>
+    </div>
+    </div>
+
+    </form> *@
+
+</body>
+</html>

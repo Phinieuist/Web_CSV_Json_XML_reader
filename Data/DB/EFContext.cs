@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Web_CSV_Json_XML_reader.Entities;
+using Web_CSV_Json_XML_reader.Data.DB.Entities;
 
-namespace Web_CSV_Json_XML_reader.DB
+namespace Web_CSV_Json_XML_reader.Data.DB
 {
     public class EFContext : DbContext
     {

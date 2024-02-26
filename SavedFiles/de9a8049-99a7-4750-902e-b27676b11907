@@ -1,0 +1,802 @@
+﻿{
+  "modName": "updTest2",
+  "displayName": "updTest333",
+  "minMcmVersion": 1.25,
+  "pluginRequirements": [],
+  "content": [
+    {
+      "text": "<p align='center'><font size='24'>Sim Settlements: Завоевание</font></p>",
+      "html": true,
+      "type": "text"
+    },
+    {
+      "type": "image",
+      "libName": "SimSettlements_XPAC_Conqueror",
+      "className": "Logo",
+      "height": 25
+    },
+    {
+      "text": "О моде",
+      "type": "section"
+    },
+    {
+      "text": "<p>Завоеватель позволяет создавать армию любимой фракции, обучать их как компаньонов и завоевывать поселения по всему Содружеству.</p><br><p>Если вы впервые пользуетесь модом, то для начала просто постройте стол Планирования войны в пустом поселении!</p>",
+      "type": "text",
+      "html": true
+    },
+    {
+      "text": " > Создать Голодиск",
+      "type": "button",
+      "help": "(Примечание: происходит после снятия паузы) Щелкнув по этой кнопке, вы создадите голодиск Сити Менеджер 2078 в вашем инвентаре.",
+      "action": {
+        "type": "CallFunction",
+        "form": "SimSettlements.esm|2E0E",
+        "function": "ConfirmCreateHolotape"
+      }
+    }
+  ],
+  "pages": [
+    {
+      "pageDisplayName": "Горячие клавиши",
+      "content": [
+        {
+          "id": "Conqueror_ClearTracking",
+          "text": "Очистить отслеживание солдат",
+          "type": "hotkey",
+          "help": "Очистите всех отслеживаемых солдат, чтобы освободить память. Это следует использовать после завершения использования опции \"Отслеживание - солдаты\" в голодиске."
+        },
+        {
+          "id": "Conqueror_ActivateSquadCommandMode",
+          "text": "Активировать командный режим отряда",
+          "type": "hotkey",
+          "help": "Находясь в этом режиме, вы можете выдавать команды перемещения и атаки всем своим личным охранникам одновременно."
+        },
+        {
+          "id": "Conqueror_RallyToMe",
+          "text": "Команда: За мной",
+          "type": "hotkey",
+          "help": "Прикажите своей Личной Охранне прнибыть на текущую позицию, а затем следовать за вами."
+        },
+        {
+          "id": "Conqueror_HoldPosition",
+          "text": "Команда: Удерживать позицию",
+          "type": "hotkey",
+          "help": "Прикажите вашей личной охране удержать свою текущую позицию."
+        },
+        {
+          "id": "Conqueror_OpenSquadMenu",
+          "text": "Открыть командное меню отряда",
+          "type": "hotkey",
+          "help": "Откройте меню Команд отряда\" в котором можно настроить следующие параметры: следование, расстояние, агрессия и т.д."
+        }
+      ]
+    },
+    {
+      "pageDisplayName": "Арсенал",
+      "content": [
+        {
+          "id": "ArmoryExtraEquipment:Conqueror",
+          "text": "Дополнительное оснащение арсенала",
+          "type": "switcher",
+          "help": "Арсенал 3-го уровня даст Вашим солдатам дополнительное снаряжение перед каждой битвой, такое как гранаты и стимпаки.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "SimSettlements_XPAC_Conqueror.esp|CF24"
+          }
+        },
+        {
+          "id": "ArmoryOutfits:Conqueror",
+          "text": "Броня арсенала",
+          "type": "switcher",
+          "help": "Арсенал 1-го уровня автоматически снабдит Ваших солдат одеждой и броней для их ранга.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "SimSettlements_XPAC_Conqueror.esp|CF22"
+          }
+        },
+        {
+          "id": "ArmoryWeapons:Conqueror",
+          "text": "Оружие арсенала",
+          "type": "switcher",
+          "help": "Арсенал 2-го уровня автоматически снабдит ваших солдат оружием для их ранга.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "SimSettlements_XPAC_Conqueror.esp|CF23"
+          }
+        }
+      ]
+    },
+    {
+      "pageDisplayName": "Назначение",
+      "content": [
+        {
+          "id": "AutoAssignAttackersToVassals:Conqueror",
+          "text": "Автоматическое назначение атакующих на защиту вассалов",
+          "type": "switcher",
+          "help": "После успешного захвата вассальского поселения, атакующие займут все боевые участки и посты охраны вассала.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "SimSettlements_XPAC_Conqueror.esp|221BD"
+          }
+        },
+        {
+          "id": "AutoChangeRoles:Conqueror",
+          "text": "Автоматическая замена ролей",
+          "type": "switcher",
+          "help": "Автоматически назначать соответствующую роль, когда одному из Ваших солдат что-то назначено. Например, если им назначен боевой участок, они автоматически получат роль Охранника.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "SimSettlements_XPAC_Conqueror.esp|275F0"
+          }
+        },
+        {
+          "id": "FactionGuardsInVassals:Conqueror",
+          "text": "Фракционные охранники у вассалов",
+          "type": "switcher",
+          "help": "Как только фракция берет под свой контроль населенный пункт в качестве вассала, только члены этой фракции могут выступать в качестве охранников, остальные жители не могут.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "SimSettlements.esm|20E4E"
+          }
+        },
+        {
+          "id": "FactionJobsInVassals:Conqueror",
+          "text": "Фракционные рабочие у вассалов",
+          "type": "switcher",
+          "help": "Как только фракция берет под свой контроль поселение в качестве вассала, члены этой фракции могут быть назначены охранниками только в этом поселении.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "SimSettlements.esm|20E4B"
+          }
+        }
+      ]
+    },
+    {
+      "pageDisplayName": "Украшения",
+      "content": [
+        {
+          "id": "AllowFactionDecorating:Conqueror",
+          "text": "Разрешить украшение фракции",
+          "type": "switcher",
+          "help": "Если декорации фракций будут настроены после того, как фракция получит контроль, они будут автоматически размещены в поселке.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "SimSettlements.esm|1AB7A"
+          }
+        },
+        {
+          "id": "AutoFactionSkinning:Conqueror",
+          "text": "Автоматическое применение скинов фракции",
+          "type": "switcher",
+          "help": "Если скин фракций будут найдены после того, как фракция возьмет контроль над ними, они будут автоматически применены к этим зданиям.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "SimSettlements.esm|1AF74"
+          }
+        }
+      ]
+    },
+    {
+      "pageDisplayName": "Эффекты",
+      "content": [
+        {
+          "id": "LevelUpFX:Conqueror",
+          "text": "Эффект повышения уровня",
+          "type": "switcher",
+          "help": "Когда один из ваших солдат получает повышение, визуальный и звуковой эффект будет играть над ними.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "SimSettlements_XPAC_Conqueror.esp|B407"
+          }
+        }
+      ]
+    },
+    {
+      "pageDisplayName": "Управление Империей",
+      "content": [
+        {
+          "id": "ControlVassalSettlements:Conqueror",
+          "text": "Контроль Вассальных поселений",
+          "type": "switcher",
+          "help": "При завоевании поселения в качестве вассала для снабжения ваших Аванпостов, вы можете сохранить контроль над вассалом и продолжать строить в нем и управлять как обычным поселением.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "SimSettlements.esm|27854"
+          },
+          "action": {
+            "type": "CallFunction",
+            "form": "SimSettlements.esm|BA69",
+            "function": "UpdateVassalOwnership"
+          }
+        },
+        {
+          "id": "SoldierNeeds:Conqueror",
+          "text": "Потребности солдат",
+          "type": "switcher",
+          "help": "(Рекомендуется HUDFramework) Когда он включен, у вас должно быть достаточно О/П/С ресурсов для того, чтобы продолжать вербовку солдат для вашего Фракции.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "SimSettlements_XPAC_Conqueror.esp|221BE"
+          }
+        },
+        {
+          "id": "VassalCitiesCanUpgrade:Conqueror",
+          "text": "Вассальные города могут быть модернизированы",
+          "type": "switcher",
+          "help": "Вассалы с городскими планами теперь могут пройти обычный процесс обновления. По умолчанию это отменяется ввиду того, что вассалы передают все лишние припасы вашим аванпостам и, следовательно, не будут иметь ресурсов для обновления.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "SimSettlements.esm|1E233"
+          }
+        }
+      ]
+    },
+    {
+      "pageDisplayName": "HUD",
+      "content": [
+        {
+          "text": "Настройки",
+          "type": "section"
+        },
+        {
+          "id": "DisplaySetting:Conqueror",
+          "text": "Использовать HUD Завоеватея",
+          "type": "stepper",
+          "help": "HUD Завоевателя появится только в аванпостах и у вассалов. В качестве альтернативы вы можете настроить его на отображение только в режиме мастерской или полностью выключить.",
+          "valueOptions": {
+            "options": [
+              "Off",
+              "On",
+              "Workshop Mode"
+            ],
+            "sourceType": "GlobalValue",
+            "sourceForm": "SimSettlements_XPAC_Conqueror.esp|275F1"
+          },
+          "action": {
+            "type": "CallFunction",
+            "form": "SimSettlements_XPAC_Conqueror.esp|14F7C",
+            "function": "MCMUpdateHUDDisplay"
+          }
+        },
+        {
+          "id": "HUDPreset:Conqueror",
+          "text": "Предустановка HUD ",
+          "type": "stepper",
+          "help": "Мы предварительно настроили несколько вариантов позиции/шкалы на выбор. Если ни один из них вас не заинтересует, вы можете воспользоваться Горячими клавишами позиционирования для их точной настройки.",
+          "valueOptions": {
+            "options": [
+              "Under Compass",
+              "Bottom Corners",
+              "Under HP/AP",
+              "Above HP/AP"
+            ],
+            "sourceType": "PropertyValueInt",
+            "sourceForm": "SimSettlements_XPAC_Conqueror.esp|14F7C",
+            "propertyName": "iCurrentHUDPresetIndex"
+          },
+          "action": {
+            "type": "CallFunction",
+            "form": "SimSettlements_XPAC_Conqueror.esp|14F7C",
+            "function": "MCMChangeHUDPreset",
+            "params": [
+              "{i}{value}"
+            ]
+          }
+        },
+        {
+          "text": "Горячие клавиши пазиционирования",
+          "type": "section"
+        },
+        {
+          "text": "Установите эти горячие клавиши временно и расположите HUD-фрагменты там, где вы хотите, затем вы можете перепривязать эти клавиши к чему-нибудь другому, если хотите.",
+          "type": "text",
+          "html": false
+        },
+        {
+          "id": "Conqueror_CycleActiveHUDPieces",
+          "text": "Цикличная активация частей HUD ",
+          "type": "hotkey",
+          "help": "Активируйте для позиционирования следующую часть HUD."
+        },
+        {
+          "id": "Conqueror_NudgeActiveHUDPieceUp",
+          "text": "Вверх",
+          "type": "hotkey",
+          "help": "Немного сдвинуть активную часть HUD вверх."
+        },
+        {
+          "id": "Conqueror_NudgeActiveHUDPieceDown",
+          "text": "Вниз",
+          "type": "hotkey",
+          "help": "Немного сдвинуть активную часть HUD вниз."
+        },
+        {
+          "id": "Conqueror_NudgeActiveHUDPieceLeft",
+          "text": "Влево",
+          "type": "hotkey",
+          "help": "Немного сдвинуть активную часть HUD влево."
+        },
+        {
+          "id": "Conqueror_NudgeActiveHUDPieceRight",
+          "text": "Вправо",
+          "type": "hotkey",
+          "help": "Немного сдвинуть активную часть HUD вправо."
+        },
+        {
+          "id": "Conqueror_ScaleActiveHUDPieceUp",
+          "text": "Увеличить размер",
+          "type": "hotkey",
+          "help": "Немного увеличить размер активной части HUD"
+        },
+        {
+          "id": "Conqueror_ScaleActiveHUDPieceDown",
+          "text": "Уменьшить размер",
+          "type": "hotkey",
+          "help": "Немного уменьшить размер активной части HUD"
+        },
+        {
+          "id": "Conqueror_ForceHideHUD",
+          "text": "Принудительное скрытие HUD",
+          "type": "hotkey",
+          "help": "Это предназначено для использования вне поселений, когда код не обрабатывает его автоматически."
+        }
+      ]
+    },
+    {
+      "pageDisplayName": "Перки",
+      "content": [
+        {
+          "id": "ExecuteEssentials:Conqueror",
+          "text": "Казнь важных НПС",
+          "type": "switcher",
+          "help": "Если вы получили Перк Палача, то выключение этого параметра не позволит вам использовать способность на важных НПС.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "SimSettlements.esm|28F20"
+          },
+          "action": {
+            "type": "CallFunction",
+            "form": "SimSettlements.esm|BA69",
+            "function": "UpdateVassalOwnership"
+          }
+        }
+      ]
+    },
+    {
+      "pageDisplayName": "Личная охрана",
+      "content": [
+        {
+          "id": "AutolootAmmo:Conqueror",
+          "text": "Автоподбор боеприпасов",
+          "type": "switcher",
+          "help": "Ваша Личная охрана будет автоматически подбирать боеприпасы с тел которых они убили.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "SimSettlements_XPAC_Conqueror.esp|24A49"
+          }
+        },
+        {
+          "id": "AutolootCaps:Conqueror",
+          "text": "Автоподбор крышек",
+          "type": "switcher",
+          "help": "Ваша Личная охрана будет автоматически подбирать крышки с тел которых они убили.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "SimSettlements_XPAC_Conqueror.esp|24A4D"
+          }
+        },
+        {
+          "id": "AutolootChems:Conqueror",
+          "text": "Автоподбор химии",
+          "type": "switcher",
+          "help": "Ваша Личная охрана будет автоматически подбирать химию/стимпаки с тел которых они убили.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "SimSettlements_XPAC_Conqueror.esp|24A4A"
+          }
+        },
+        {
+          "id": "AutolootGrenades:Conqueror",
+          "text": "Автоподбор гранат",
+          "type": "switcher",
+          "help": "Ваша Личная охрана будет автоматически подбирать гранаты с тел которых они убили.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "SimSettlements_XPAC_Conqueror.esp|24A4B"
+          }
+        },
+        {
+          "id": "CompanionsListenToSquadCommands:Conqueror",
+          "text": "Компаньоны выполняют команды отряда",
+          "type": "switcher",
+          "help": "Давая команды своей личной охране, твои компаньоны также будут их выполнять.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "SimSettlements_XPAC_Conqueror.esp|25218"
+          },
+          "action": {
+            "type": "CallFunction",
+            "form": "SimSettlements_XPAC_Conqueror.esp|24A32",
+            "function": "UpdateNonConquerorFollowerCommands"
+          }
+        },
+        {
+          "id": "Mortal:Conqueror",
+          "text": "Смерть",
+          "type": "switcher",
+          "help": "Ваша личная охрана может умереть (до тех пор, пока не достигнет 5-го ранга).",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "SimSettlements_XPAC_Conqueror.esp|24A43"
+          }
+        },
+        {
+          "id": "ShareXP:Conqueror",
+          "text": "Делиться XP",
+          "type": "switcher",
+          "help": "Ваши Личные Охранники используют ваш XP. Это функция баланса уменшающая количество опыта с убитых, которые вы получаете во время использования личной охраны.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "SimSettlements_XPAC_Conqueror.esp|24A40"
+          }
+        },
+        {
+          "id": "UseAmmo:Conqueror",
+          "text": "Использовать боеприпасы",
+          "type": "switcher",
+          "help": "Ваша личная охрана будет расходовать боеприпасы и будет нуждаться в добыче или получении большего количества боеприпасов.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "SimSettlements_XPAC_Conqueror.esp|24A42"
+          }
+        }
+      ]
+    },
+    {
+      "pageDisplayName": "ИИ рейда (Нападения на меня)",
+      "content": [
+        {
+          "id": "PreventHostileTakeover:Conqueror",
+          "text": "Предотвращение враждебного захвата",
+          "type": "switcher",
+          "help": "Включение этого параметра не позволит врагам захватить контроль над вашими аванпостами и вассалами, когда они останутся без охраны на слишком долгое время.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "SimSettlements_XPAC_Conqueror.esp|28D08"
+          }
+        },
+        {
+          "id": "PreventOutpostRaids:Conqueror",
+          "text": "Предотвращение рейдов на аванпосты",
+          "type": "switcher",
+          "help": "Включение этого параметра предотвратит периодическую атаку на ваши вторичные аванпосты, когда их количество очков контроля будет низким.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "SimSettlements_XPAC_Conqueror.esp|28D06"
+          }
+        },
+        {
+          "id": "PreventVassalRaids:Conqueror",
+          "text": "Предотвращение рейдов на вассалов",
+          "type": "switcher",
+          "help": "Включение этого параметра предотвратит периодическую атаку на  вассалов, когда их количество очков контроля будет низким.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "SimSettlements_XPAC_Conqueror.esp|28D07"
+          }
+        }
+      ]
+    },
+    {
+      "pageDisplayName": "Raids PC (Штурм управляемый мной)",
+      "content": [
+        {
+          "id": "SoldierFollow:Conqueror",
+          "text": "Солдаты следуют",
+          "type": "switcher",
+          "help": "В начале штурма ваши солдаты будут следовать за вами, пока не начнется битва.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "SimSettlements_XPAC_Conqueror.esp|8CB6"
+          }
+        },
+        {
+          "id": "UseRankAttackerMenu:Conqueror",
+          "text": "Использовать меню Ранга атакующих",
+          "type": "switcher",
+          "help": "При настройке атаки, вы можете выбрать, сколько солдат каждого ранга отправить.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "SimSettlements_XPAC_Conqueror.esp|D6EF"
+          }
+        }
+      ]
+    },
+    {
+      "pageDisplayName": "Слежение",
+      "content": [
+        {
+          "id": "ClearAll:Tracking",
+          "text": "Очистить слежение за солдатами",
+          "type": "button",
+          "help": "(Примечание: применяется после снятия паузы) Щелкнув по этой кнопке, вы очистите все отслеживаемые солдаты, чтобы освободить память.",
+          "action": {
+            "type": "CallFunction",
+            "form": "SimSettlements_XPAC_Conqueror.esp|1EC48",
+            "function": "MCMClearTracking"
+          }
+        },
+        {
+          "id": "Captives:Tracking",
+          "text": "Пленники",
+          "type": "switcher",
+          "help": "Пленники в ваших аванпостах и у вассалаов будут отмечены на карте.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "SimSettlements_XPAC_Conqueror.esp|1993B"
+          },
+          "action": {
+            "type": "CallFunction",
+            "form": "SimSettlements_XPAC_Conqueror.esp|1EC48",
+            "function": "ToggleTrackingFromMCM",
+            "params": [
+              "{i}10"
+            ]
+          }
+        },
+        {
+          "id": "Civilians:Tracking",
+          "text": "Гражданские",
+          "type": "switcher",
+          "help": "Гражданские в ваших аванпостах и у вассалаов будут отмечены на карте.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "SimSettlements_XPAC_Conqueror.esp|1993C"
+          },
+          "action": {
+            "type": "CallFunction",
+            "form": "SimSettlements_XPAC_Conqueror.esp|1EC48",
+            "function": "ToggleTrackingFromMCM",
+            "params": [
+              "{i}20"
+            ]
+          }
+        },
+        {
+          "id": "Guards:Tracking",
+          "text": "Охрана",
+          "type": "switcher",
+          "help": "Охрана в ваших аванпостах и у вассалаов будут отмечены на карте.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "SimSettlements_XPAC_Conqueror.esp|1993D"
+          },
+          "action": {
+            "type": "CallFunction",
+            "form": "SimSettlements_XPAC_Conqueror.esp|1EC48",
+            "function": "ToggleTrackingFromMCM",
+            "params": [
+              "{i}30"
+            ]
+          }
+        },
+        {
+          "id": "Leadership:Tracking",
+          "text": "Лидер",
+          "type": "switcher",
+          "help": "Лидеры в ваших аванпостах и у вассалаов будут отмечены на карте.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "SimSettlements_XPAC_Conqueror.esp|1993E"
+          },
+          "action": {
+            "type": "CallFunction",
+            "form": "SimSettlements_XPAC_Conqueror.esp|1EC48",
+            "function": "ToggleTrackingFromMCM",
+            "params": [
+              "{i}40"
+            ]
+          }
+        },
+        {
+          "id": "Patrols:Tracking",
+          "text": "Патрули",
+          "type": "switcher",
+          "help": "Патрульные в ваших аванпостах и у вассалаов будут отмечены на карте.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "SimSettlements_XPAC_Conqueror.esp|1993F"
+          },
+          "action": {
+            "type": "CallFunction",
+            "form": "SimSettlements_XPAC_Conqueror.esp|1EC48",
+            "function": "ToggleTrackingFromMCM",
+            "params": [
+              "{i}50"
+            ]
+          }
+        },
+        {
+          "id": "PersonalGuards:Tracking",
+          "text": "Личная охрана",
+          "type": "switcher",
+          "help": "Личная охрана в ваших аванпостах и у вассалаов будут отмечены на карте.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "SimSettlements_XPAC_Conqueror.esp|24A46"
+          },
+          "action": {
+            "type": "CallFunction",
+            "form": "SimSettlements_XPAC_Conqueror.esp|24A32",
+            "function": "ToggleTrackingFromMCM",
+            "params": [
+              "{i}1"
+            ]
+          }
+        },
+        {
+          "id": "Robots:Tracking",
+          "text": "Роботы",
+          "type": "switcher",
+          "help": "Роботы в ваших аванпостах и у вассалаов будут отмечены на карте.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "SimSettlements_XPAC_Conqueror.esp|19940"
+          },
+          "action": {
+            "type": "CallFunction",
+            "form": "SimSettlements_XPAC_Conqueror.esp|1EC48",
+            "function": "ToggleTrackingFromMCM",
+            "params": [
+              "{i}55"
+            ]
+          }
+        },
+        {
+          "id": "Warriors:Tracking",
+          "text": "Воины",
+          "type": "switcher",
+          "help": "Воины в ваших аванпостах и у вассалаов будут отмечены на карте.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "SimSettlements_XPAC_Conqueror.esp|19941"
+          },
+          "action": {
+            "type": "CallFunction",
+            "form": "SimSettlements_XPAC_Conqueror.esp|1EC48",
+            "function": "ToggleTrackingFromMCM",
+            "params": [
+              "{i}60"
+            ]
+          }
+        },
+        {
+          "id": "Workers:Tracking",
+          "text": "Рабочий",
+          "type": "switcher",
+          "help": "Рабочие в ваших аванпостах и у вассалаов будут отмечены на карте.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "SimSettlements_XPAC_Conqueror.esp|19942"
+          },
+          "action": {
+            "type": "CallFunction",
+            "form": "SimSettlements_XPAC_Conqueror.esp|1EC48",
+            "function": "ToggleTrackingFromMCM",
+            "params": [
+              "{i}70"
+            ]
+          }
+        },
+        {
+          "id": "Rank1Soldiers:Tracking",
+          "text": "Солдаты 1 ранга",
+          "type": "switcher",
+          "help": "Солдаты 1 ранга в ваших аванпостах и у вассалаов будут отмечены на карте.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "SimSettlements_XPAC_Conqueror.esp|1A0F5"
+          },
+          "action": {
+            "type": "CallFunction",
+            "form": "SimSettlements_XPAC_Conqueror.esp|1EC48",
+            "function": "ToggleTrackingFromMCM",
+            "params": [
+              "{i}80"
+            ]
+          }
+        },
+        {
+          "id": "Rank2Soldiers:Tracking",
+          "text": "Солдаты 2 ранга",
+          "type": "switcher",
+          "help": "Солдаты 2 ранга в ваших аванпостах и у вассалаов будут отмечены на карте.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "SimSettlements_XPAC_Conqueror.esp|1A0F6"
+          },
+          "action": {
+            "type": "CallFunction",
+            "form": "SimSettlements_XPAC_Conqueror.esp|1EC48",
+            "function": "ToggleTrackingFromMCM",
+            "params": [
+              "{i}90"
+            ]
+          }
+        },
+        {
+          "id": "Rank3Soldiers:Tracking",
+          "text": "Солдаты 3 ранга",
+          "type": "switcher",
+          "help": "Солдаты 3 ранга в ваших аванпостах и у вассалаов будут отмечены на карте.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "SimSettlements_XPAC_Conqueror.esp|1A0F7"
+          },
+          "action": {
+            "type": "CallFunction",
+            "form": "SimSettlements_XPAC_Conqueror.esp|1EC48",
+            "function": "ToggleTrackingFromMCM",
+            "params": [
+              "{i}100"
+            ]
+          }
+        },
+        {
+          "id": "Rank4Soldiers:Tracking",
+          "text": "Солдаты 4 ранга",
+          "type": "switcher",
+          "help": "Солдаты 4 ранга в ваших аванпостах и у вассалаов будут отмечены на карте.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "SimSettlements_XPAC_Conqueror.esp|1A0F8"
+          },
+          "action": {
+            "type": "CallFunction",
+            "form": "SimSettlements_XPAC_Conqueror.esp|1EC48",
+            "function": "ToggleTrackingFromMCM",
+            "params": [
+              "{i}110"
+            ]
+          }
+        },
+        {
+          "id": "Rank5Soldiers:Tracking",
+          "text": "Солдаты 5 ранга",
+          "type": "switcher",
+          "help": "Солдаты 5 ранга в ваших аванпостах и у вассалаов будут отмечены на карте.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "SimSettlements_XPAC_Conqueror.esp|1A0F9"
+          },
+          "action": {
+            "type": "CallFunction",
+            "form": "SimSettlements_XPAC_Conqueror.esp|1EC48",
+            "function": "ToggleTrackingFromMCM",
+            "params": [
+              "{i}120"
+            ]
+          }
+        },
+        {
+          "id": "SpecialUnits:Tracking",
+          "text": "Особые персонажи",
+          "type": "switcher",
+          "help": "Особые персонажи в ваших аванпостах и у вассалаов будут отмечены на карте.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "SimSettlements_XPAC_Conqueror.esp|1A0FA"
+          },
+          "action": {
+            "type": "CallFunction",
+            "form": "SimSettlements_XPAC_Conqueror.esp|1EC48",
+            "function": "ToggleTrackingFromMCM",
+            "params": [
+              "{i}130"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

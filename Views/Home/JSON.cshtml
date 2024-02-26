@@ -1,6 +1,106 @@
-﻿@using Web_CSV_Json_XML_reader.Models
-@using Web_CSV_Json_XML_reader.Controllers
+﻿@using Web_CSV_Json_XML_reader.ViewModels;
+@using Web_CSV_Json_XML_reader.Controllers;
+@using Newtonsoft.Json.Linq;
 @model JSONViewModel;
+
+@functions {
+    void ParseJSON(JToken token, string prefix = "")
+    {
+        if (token is JValue)
+        {
+            // если элемент является простым значением (не объектом или массивом),
+            // выводим его значение в тег <input> для возможности редактирования
+            JValue val = (JValue)token;
+            string name = prefix;
+            string type = "text";
+            string tag = "";
+            string output = string.Empty;
+
+            switch (val.Type)
+            {
+                case JTokenType.Integer:
+                    <input type="number" name="@name" value="@val.Value" />
+                    break;
+                case JTokenType.Float:
+                    <input type="number" name="@name" value="@Convert.ToString(val.Value, System.Globalization.CultureInfo.InvariantCulture)" />
+                    break;
+                case JTokenType.String:
+                    <textarea name="@name" class="form-control textInp">@val.Value</textarea>
+                    break;
+                case JTokenType.Boolean:
+                    string varTrue = string.Empty;
+                    string varFalse = string.Empty;
+
+                    <select name="@name" class="custom-select">
+                        @if ((bool)val.Value)
+                        {
+                        <!option selected value="true">true</!option>
+                        <!option value="false">false</!option>
+                        }
+                        else
+                        {
+                        <!option value="true">true</!option>
+                        <!option selected value="false">false</!option>
+                        }
+                    </select>
+                    break;
+                case JTokenType.Date:
+                    < input type = "datetime-local" name = "@name" value = "@val.Value" />
+                    break;
+                default:
+                    break;
+            }
+        }
+        else if (token is JArray)
+        {
+            // если элемент является массивом, создаем тег <details>,
+            // в который будут добавляться все элементы массива
+            JArray arr = (JArray)token;
+            string name = prefix;
+
+            <p>
+                <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#ID_@name" aria-expanded="false" aria-controls="ID_@name">Array [@arr.Count]</button>
+            </p>
+            <div class="collapse" id="ID_@name">
+                <ul>
+                    @for (int i = 0; i < arr.Count; i++)
+                    {
+                        <li>@{ParseJSON(arr[i], $"{name}[{i}]");}</li>
+                    }
+                </ul>
+            </div>
+        }
+        else if (token is JObject)
+        {
+            // если элемент является объектом, создаем тег <details>,
+            // в который будут добавляться все свойства объекта
+            JObject obj = (JObject)token;
+            string name = prefix;
+            <p>
+                <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#ID_@name" aria-expanded="false" aria-controls="ID_@name">Object [@obj.Count]</button>
+            </p>
+            <div class="collapse" id="ID_@name">
+                <ul>
+                    @foreach (JProperty prop in obj.Properties())
+                    {
+                        <li>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend"><span class="input-group-text">@prop.Name</span></div>
+                                @{ParseJSON(prop.Value, $"{name}.{prop.Name}");}
+                            </div>
+                        </li>
+                    }
+                </ul>
+            </div>
+        }
+        else
+        {
+            // в случае неизвестного типа элемента, выбрасываем исключение
+            throw new Exception("Неизвестный JSON элемент.");
+        }
+    }
+}
+
 
 <!DOCTYPE html>
 <html>
@@ -9,12 +109,12 @@
     <meta charset="utf-8" />
 </head>
 <body>
-    <form method="POST" action="/Home/JSONSave">
+    <form method="POST">
         <div class="centered">
             <div class="card card-body">
                 <div class="btn-group mb-3" role="group">
-                    <a class="btn btn-secondary" href="/home/Index">Вернуться на главную</a>
-                    <input class="btn btn-secondary" type="submit" value="Сохранить изменения" />
+                    <input class="btn btn-secondary" type="submit" formaction="/Home/JSONDownload" value="Скачать файл" />
+                    <input class="btn btn-secondary" type="submit" formaction="/Account/JSONSave" value="Сохранить файл" />
                 </div>
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
@@ -24,12 +124,20 @@
                 </div>
             </div>
         </div>
-        <div class="div-for-raw">
+        @*<div class="div-for-raw">
             <div class="card card-body">
                 @Html.Raw(Model.RawHTML)
             </div>
         </div>
+        *@
+        <div class="div-for-raw">
+            <div class="card card-body">
+                @{ParseJSON(Model.Data);}
+            </div>
+        </div>
         <input type="hidden" value="@Model.Data" name="Data" />    
+        <input type="hidden" value="@Model.IsExistsInDB.ToString()" name="IsExistsInDB" />
+        <input type="hidden" value="@Model.FileId.ToString()" name="FileId" />
     </form>
     
 </body>

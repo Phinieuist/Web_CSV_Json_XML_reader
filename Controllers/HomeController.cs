@@ -5,18 +5,25 @@ using Newtonsoft.Json.Linq;
 using System.Data;
 using System.Diagnostics;
 using System.Dynamic;
+using System.Security.Claims;
 using System.Xml;
+using Web_CSV_Json_XML_reader.Data.Managers.Interfaces;
 using Web_CSV_Json_XML_reader.Models;
+using Web_CSV_Json_XML_reader.ViewModels;
 
 namespace Web_CSV_Json_XML_reader.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IFileSaveManager _fileSaveManager;
+        private readonly IViewModelsCreator _viewModelsCreator;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IFileSaveManager fileSaveManager, IViewModelsCreator viewModelsCreator)
         {
             _logger = logger;
+            _fileSaveManager = fileSaveManager;
+            _viewModelsCreator = viewModelsCreator;
         }
 
         public IActionResult Index()
@@ -27,7 +34,7 @@ namespace Web_CSV_Json_XML_reader.Controllers
         public ActionResult DownloadFile(string filePath, string downloadFileName)
         {
             string contentType = "text/plain";
-            return File(filePath, contentType, downloadFileName);           
+            return File(filePath, contentType, downloadFileName);
         }
 
         public ActionResult DownloadFile(Stream file, string downloadFileName)
@@ -44,22 +51,19 @@ namespace Web_CSV_Json_XML_reader.Controllers
                 if (string.IsNullOrEmpty(model.Name))
                     model.Name = "WebInput";
 
-                string rawHTML;
+                if (string.IsNullOrEmpty(model.CSVSeparator))
+                    model.CSVSeparator = CSVDataTable.DefaultSeparator;
 
                 switch (model.Type)
                 {
                     case FileType.CSV:
-                        return View("CSV", CSVReader.TFPRead(model.Text, model.Name, model.CSVSeparator));
+                        return View("CSV", _viewModelsCreator.GetCsvVM(model.Text, model.Name, model.CSVSeparator));
 
                     case FileType.XML:
-                        XmlDocument xmlD;
-                        rawHTML = XMLReader.Read(model.Text, out xmlD);
-                        return View("XML", new XMLViewModel(rawHTML, xmlD, model.Name));
+                        return View("XML", _viewModelsCreator.GetXmlVM(model.Text, model.Name));
 
                     case FileType.JSON:
-                        JToken token;
-                        rawHTML = JSONReader.ReadForWeb(model.Text, out token);
-                        return View("JSON", new JSONViewModel(token, rawHTML, model.Name));
+                        return View("JSON", _viewModelsCreator.GetJsonVM(model.Text, model.Name));
                 }
 
                 return View("TextInput");
@@ -71,45 +75,44 @@ namespace Web_CSV_Json_XML_reader.Controllers
         }
 
         [HttpPost]
-        public IActionResult CSVsave()
+        public IActionResult CSVDownload()
         {
             try
             {
-                return DownloadFile(FileSaver.SaveCSV(Request), FileSaver.GetFileName(FileType.CSV, Request.Form["Name"].ToString()));
+                FileSaveHelper fileSaveHelper = _fileSaveManager.Download(FileType.CSV, Request);
+                return DownloadFile(fileSaveHelper.DataToSave, fileSaveHelper.FileName);
             }
             catch (Exception ex)
             {
-                return View("_Error", ex.Message);
+                return ViewResultCreator.Error(ex);
             }
         }
 
         [HttpPost]
-        public IActionResult JSONSave(JSONViewModel model)
+        public IActionResult JSONDownload()
         {
             try
             {
-                model.Data = JToken.Parse(Request.Form["Data"]);
-                return DownloadFile(FileSaver.SaveJSON(model.Data, Request), FileSaver.GetFileName(FileType.JSON, model.Name));
+                FileSaveHelper fileSaveHelper = _fileSaveManager.Download(FileType.JSON, Request);
+                return DownloadFile(fileSaveHelper.DataToSave, fileSaveHelper.FileName);
             }
             catch (Exception ex)
             {
-                return View("_Error", ex.Message);
+                return ViewResultCreator.Error(ex);
             }
         }
 
         [HttpPost]
-        public IActionResult XMLSave(XMLViewModel model)
+        public IActionResult XMLDownload()
         {
             try
             {
-                model.Data = new XmlDocument();
-                model.Data.LoadXml(Request.Form["Data"]);
-
-                return DownloadFile(FileSaver.SaveXML(model, Request), FileSaver.GetFileName(FileType.XML, model.Name));
+                FileSaveHelper fileSaveHelper = _fileSaveManager.Download(FileType.XML, Request);
+                return DownloadFile(fileSaveHelper.DataToSave, fileSaveHelper.FileName);
             }
             catch (Exception ex)
             {
-                return View("_Error", ex.Message);
+                return ViewResultCreator.Error(ex);
             }
         }
 

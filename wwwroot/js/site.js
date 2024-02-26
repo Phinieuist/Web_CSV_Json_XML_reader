@@ -86,3 +86,119 @@ $(document).ready(function () {
         }
     }
 });
+
+(function () {
+    'use strict';
+
+    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+    var forms = document.querySelectorAll('.needs-validation');
+
+    // Loop over them and prevent submission
+    Array.prototype.slice.call(forms).forEach(function (form) {
+        // Получение полей ввода
+        var emailRegisterInput = form.querySelector('#validationRegisterEmail');
+        var passwordRegisterInput = form.querySelector('#validationRegisterPassword');
+        var confirmRegisterPasswordInput = form.querySelector('#validationRegisterPasswordRepeat');
+        var emailLoginInput = form.querySelector('#validationLoginEmail');
+        var passwordLoginInput = form.querySelector('#validationLoginPassword');
+
+        // Добавление слушателей событий для проверки ввода при вводе или изменении значения
+        if (emailRegisterInput !== null) emailRegisterInput.addEventListener('input', validateRegisterEmail);
+        if (passwordRegisterInput !== null) passwordRegisterInput.addEventListener('input', validateRegisterPassword);
+        if (confirmRegisterPasswordInput !== null) confirmRegisterPasswordInput.addEventListener('input', validateRegisterConfirmPassword);
+        if (emailLoginInput !== null) emailLoginInput.addEventListener('input', validateLoginEmail);
+        if (passwordLoginInput !== null) passwordLoginInput.addEventListener('input', validateLoginPassword);
+
+        // Добавление слушателя события 'submit' для формы
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+
+        validateFieldsOnLoad();
+
+        // Функция для проверки полей сразу после загрузки страницы
+        function validateFieldsOnLoad() {
+            if (emailRegisterInput !== null) validateRegisterEmail.call(emailRegisterInput); // Проверяем поле email
+            if (passwordRegisterInput !== null) validateRegisterPassword.call(passwordRegisterInput); // Проверяем поле password
+            if (confirmRegisterPasswordInput !== null) validateRegisterConfirmPassword.call(confirmRegisterPasswordInput); // Проверяем поле confirmPassword
+            if (emailLoginInput !== null) validateLoginEmail.call(emailLoginInput);
+            if (passwordLoginInput !== null) validateLoginPassword.call(passwordLoginInput);
+        }
+    });
+
+    // Функции для валидации полей
+    function validateRegisterEmail() {
+        var email = this.value;
+        var isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        var emailError = document.getElementById('emailRegisterError');
+        if (!isValid) {
+            this.setCustomValidity('Пожалуйста, введите правильный адрес электронной почты');
+            emailError.textContent = 'Пожалуйста, введите правильный адрес электронной почты';
+        } else {
+            this.setCustomValidity('');
+            emailError.textContent = '';
+        }
+    }
+
+    function validateRegisterPassword() {
+        var password = this.value;
+        var passwordError = document.getElementById('passwordRegisterError');
+        if (password.length < 6) {
+            this.setCustomValidity('Пароль должен содержать не менее 6 символов');
+            passwordError.textContent = 'Пароль должен содержать не менее 6 символов';
+        } else {
+            this.setCustomValidity('');
+            passwordError.textContent = '';
+        }
+    }
+
+    function validateRegisterConfirmPassword() {
+        var confirmPassword = this.value;
+        var password = document.getElementById('validationRegisterPassword').value;
+        var confirmPasswordError = document.getElementById('confirmRegisterPasswordError');
+        if (confirmPassword !== password) {
+            this.setCustomValidity('Пароли не совпадают');
+            confirmPasswordError.textContent = 'Пароли не совпадают';
+        } else {
+            this.setCustomValidity('');
+            confirmPasswordError.textContent = '';
+        }
+    }
+
+    function validateLoginEmail() {
+        var email = this.value;
+        var isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        var emailError = document.getElementById('emailLoginError');
+        if (!isValid) {
+            this.setCustomValidity('Пожалуйста, введите правильный адрес электронной почты');
+            emailError.textContent = 'Пожалуйста, введите правильный адрес электронной почты';
+        } else {
+            this.setCustomValidity('');
+            emailError.textContent = '';
+        }
+    }
+
+    function validateLoginPassword() {
+        var password = this.value;
+        var passwordError = document.getElementById('LoginPasswordError');
+        if (password.length < 1) {
+            this.setCustomValidity('Введите пароль');
+            passwordError.textContent = 'Введите пароль';
+        } else {
+            this.setCustomValidity('');
+            passwordError.textContent = '';
+        }
+    }
+
+})();
+
+function OnDeleteUser() {
+    var answer = window.confirm("Вы дейсвительно хотите удалить аккаунт? Все ваши сохранённые файлы будут удалены");
+
+    return answer;
+}
+

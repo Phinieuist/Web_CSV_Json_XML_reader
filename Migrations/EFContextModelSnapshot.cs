@@ -3,7 +3,8 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Web_CSV_Json_XML_reader.DB;
+using Web_CSV_Json_XML_reader.Data.DB;
+
 
 #nullable disable
 

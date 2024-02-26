@@ -2,6 +2,7 @@
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Text;
 using System.Reflection;
+using Web_CSV_Json_XML_reader.ViewModels;
 
 namespace Web_CSV_Json_XML_reader.Models
 {
@@ -51,6 +52,15 @@ namespace Web_CSV_Json_XML_reader.Models
             {
                 throw ex;
             }
+        }
+
+        public static CSVDataTable TFPRead(string csvtext, string outputName, string separator, bool IsExistsInDB, Guid FileID)
+        {
+            CSVDataTable dataTable = TFPRead(csvtext, outputName, separator);
+            dataTable.IsExistsInDB = IsExistsInDB;
+            dataTable.FileId = FileID;
+
+            return dataTable;
         }
 
         public static CSVDataTable TFPRead(string csvtext, string outputName, string separator)

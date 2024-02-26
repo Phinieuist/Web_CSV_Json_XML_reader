@@ -6,16 +6,25 @@
 </head>
 <body>
     <h2 class="centered">Вход на сайт</h2>
-    <form method="post" action="/Account/Login">
-        <div class="input-group mb-3 centered">
-            <input class="form-control" style="width:100%;" placeholder="Введите ваш Email" type="text" name="email" /><br>
-        </div>
-        <div class="input-group mb-3 centered">
-            <input class="form-control" style="width:100%;" placeholder="Введите ваш пароль" type="password" name="password" /><br>
-        </div>
-        <div class="centered">
-            <input class="btn btn-primary" type="submit" value="Войти" /><br>
-        </div>
+    <div class="centered">
+    <form class="row g-3 needs-validation" novalidate name="loginForm" method="post" action="/Account/Login">
+            <div class="card card-body">
+                <div class="input-group mb-3">
+                    <input class="form-control" id="validationLoginEmail" style="width:100%;" placeholder="Введите ваш Email" type="text" name="email" required/>
+                    <div class="invalid-feedback" id="emailLoginError"></div>
+                    <br>
+                </div>
+                <div class="input-group mb-3">
+                    <input class="form-control" id="validationLoginPassword" style="width:100%;" placeholder="Введите ваш пароль" type="password" name="password" required />
+                    <div class="invalid-feedback" id="LoginPasswordError"></div>
+                    <br>
+                </div>
+                <div>
+                    <input class="btn btn-primary" type="submit" value="Войти" />
+                    <br>
+                </div>
+            </div>
     </form>
+    </div>
 </body>
 </html>

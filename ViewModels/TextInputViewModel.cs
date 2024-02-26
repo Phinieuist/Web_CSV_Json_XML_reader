@@ -1,4 +1,6 @@
-﻿namespace Web_CSV_Json_XML_reader.Models
+﻿using Web_CSV_Json_XML_reader.Models;
+
+namespace Web_CSV_Json_XML_reader.ViewModels
 {
     public class TextInputViewModel
     {
@@ -8,12 +10,5 @@
         public FileType Type { get; set; }
 
         public TextInputViewModel() { }
-    }
-
-    public enum FileType
-    {
-        CSV,
-        JSON,
-        XML
     }
 }

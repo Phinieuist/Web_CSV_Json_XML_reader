@@ -1,0 +1,29 @@
+﻿@using System.Security.Claims;
+
+@{
+    string email = User.Claims.Where(q => q.Type == ClaimTypes.Name).First().Value.ToString();
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title>Профиль @email</title>
+</head>
+<body>
+    <h2 class="centered">Управление аккаунтом</h2>
+    <div class="centered">
+        <div class="card card-body">
+            <div>
+                <span class ="mb-0 h4">Email: @email</span>
+            </div>
+            <br />
+            <div>
+                <a class="btn btn-primary" href="/Account/ChangePassword">Изменить пароль</a>
+                <a class="btn btn-primary" href="/Account/DeleteUser" onclick="return OnDeleteUser()" style="background-color:orangered">Удалить аккаунт</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
