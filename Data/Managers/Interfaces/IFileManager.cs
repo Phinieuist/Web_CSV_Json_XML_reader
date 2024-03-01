@@ -22,6 +22,6 @@ namespace Web_CSV_Json_XML_reader.Data.Managers.Interfaces
 
         public Task<bool> UpdateFile(FileSaveHelper fileSaveHelper, Guid fileId);
 
-        public Task<ViewResult> OpenFile(Guid fileId);
+        public Task<string> GetFileContent(Guid fileId);
     }
 }

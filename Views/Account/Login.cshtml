@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@model bool; //true - есть ошибка, false - нет ошибки
+
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset='utf-8' />
@@ -7,10 +9,16 @@
 <body>
     <h2 class="centered">Вход на сайт</h2>
     <div class="centered">
-    <form class="row g-3 needs-validation" novalidate name="loginForm" method="post" action="/Account/Login">
-            <div class="card card-body">
+        <div class="card card-body">
+            @if (Model)
+            {
+                <div class="alert alert-danger" role="alert">
+                    <span>Логин или пароль введён неверно</span>
+                </div>
+            }
+            <form class="row g-3 needs-validation" novalidate name="loginForm" method="post" action="/Account/Login">
                 <div class="input-group mb-3">
-                    <input class="form-control" id="validationLoginEmail" style="width:100%;" placeholder="Введите ваш Email" type="text" name="email" required/>
+                    <input class="form-control" id="validationLoginEmail" style="width:100%;" placeholder="Введите ваш Email" type="text" name="email" required />
                     <div class="invalid-feedback" id="emailLoginError"></div>
                     <br>
                 </div>
@@ -23,8 +31,8 @@
                     <input class="btn btn-primary" type="submit" value="Войти" />
                     <br>
                 </div>
-            </div>
-    </form>
+            </form>
+        </div>
     </div>
 </body>
 </html>

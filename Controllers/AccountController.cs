@@ -15,6 +15,8 @@ using Microsoft.AspNetCore.Identity;
 using Web_CSV_Json_XML_reader.Data.DB.Entities;
 using Web_CSV_Json_XML_reader.Data.Managers.Interfaces;
 using Web_CSV_Json_XML_reader.ViewModels;
+using Microsoft.EntityFrameworkCore;
+using Web_CSV_Json_XML_reader.Data.Managers;
 
 namespace Web_CSV_Json_XML_reader.Controllers
 {
@@ -24,6 +26,7 @@ namespace Web_CSV_Json_XML_reader.Controllers
         private readonly IFileManager _fileManager;
         private readonly IFileSaveManager _fileSaveManager;
         private readonly IPasswordHasher<User> _passwordHasher;
+        private readonly IViewModelsCreator _viewModelsCreator;
 
         public ActionResult Index()
         {
@@ -38,17 +41,31 @@ namespace Web_CSV_Json_XML_reader.Controllers
         [Authorize]
         public async Task<IActionResult> SavedFiles()
         {
-            string userID = Request.HttpContext.User.Claims.Where(q => q.Type == ClaimTypes.NameIdentifier).First().Value;
-            return View(await _fileManager.GetFiles(Guid.Parse(userID)));
+            try
+            {
+                string userID = Request.HttpContext.User.Claims.Where(q => q.Type == ClaimTypes.NameIdentifier).First().Value;
+                return View(await _fileManager.GetFiles(Guid.Parse(userID)));
+            }
+            catch (Exception ex)
+            {
+                return ViewResultCreator.Error(ex);
+            }
         }
 
         [Authorize]
-        public async Task<IResult> DeleteFile(Guid FileId)
+        public async Task<IActionResult> DeleteFile(Guid FileId)
         {
-            if (await _fileManager.DeleteFile(FileId))
-                return Results.Redirect("/Account/SavedFiles");
-            else
-                return Results.BadRequest("Ошибка при удалении файла");
+            try
+            {
+                if (await _fileManager.DeleteFile(FileId))
+                    return View("SavedFiles");
+                else
+                    return ViewResultCreator.Error("Ошибка при удалении файла");
+            }
+            catch (Exception ex)
+            {
+                return ViewResultCreator.Error(ex);
+            }
         }
 
         [Authorize]
@@ -56,9 +73,42 @@ namespace Web_CSV_Json_XML_reader.Controllers
         {
             try
             {
-                return await _fileManager.OpenFile(FileId);
+                Data.DB.Entities.File file = await _fileManager.GetFile(FileId);
+                string fileContent = await _fileManager.GetFileContent(FileId);
+                string path = Path.Combine(Directory.GetCurrentDirectory(), "SavedFiles", file.FileId.ToString());
+
+                string extension = Path.GetExtension(file.FileName).Trim().ToLower();
+                string rawHTML = string.Empty;
+
+                switch (extension)
+                {
+                    case ".json":
+                        return View("~/Views/Home/JSON.cshtml", _viewModelsCreator.GetJsonVM(fileContent, file.FileName, true, file.FileId));
+
+                    case ".xml":
+                        return View("~/Views/Home/XML.cshtml", _viewModelsCreator.GetXmlVM(fileContent, file.FileName, true, file.FileId));
+
+                    case ".csv":
+                        string[] parts = Path.GetFileNameWithoutExtension(file.FileName).Split("%sep%");
+                        string separator = parts.Last();
+                        string outputName = string.Empty;
+
+                        if (parts.Length == 2)
+                        {
+                            outputName = string.Concat(parts[0], ".csv");
+                        }
+                        else
+                        {
+                            outputName = string.Concat(string.Join("%sep%", parts.SkipLast(1).ToArray()), ".csv");
+                        }
+
+                        CSVDataTable csvVM = _viewModelsCreator.GetCsvVM(fileContent, outputName, separator, true, file.FileId);
+
+                        return View("~/Views/Home/CSV.cshtml", csvVM);
+                    default: return View("SavedFiles");
+                }
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 return ViewResultCreator.Error(ex);
             }
@@ -109,50 +159,69 @@ namespace Web_CSV_Json_XML_reader.Controllers
         [Authorize]
         public async Task<ActionResult> SetNewPassword(ChangePasswordViewModel model)
         {
-            Web_CSV_Json_XML_reader.Data.DB.Entities.User user = await _userManager.GetUser(Guid.Parse(User.Claims.Where(q => q.Type == ClaimTypes.NameIdentifier).First().Value.ToString()));
+            if (model.newPassword != model.newPasswordRepeat)
+            {
+                model.errorMessage = "Повторите новый пароль, пароли должны совпадать";
+                return View("ChangePassword", model);
+            }
+
+            Data.DB.Entities.User user = await _userManager.GetUser(Guid.Parse(User.Claims.Where(q => q.Type == ClaimTypes.NameIdentifier).First().Value.ToString()));
 
             PasswordVerificationResult verificationResult = _passwordHasher.VerifyHashedPassword(user, user.Password, model.oldPassword);
 
-            if (verificationResult is PasswordVerificationResult.Failed) 
-                return ViewResultCreator.Error("Введён неверный текущий пароль при попытке смены пароля");
+            if (verificationResult is PasswordVerificationResult.Failed)
+            {
+                model.errorMessage = "Введён неверный текущий пароль";
+                return View("ChangePassword", model);
+            }
 
             Data.DB.Entities.User newUser = new User(user);
             newUser.Password = _passwordHasher.HashPassword(newUser, model.newPassword);
 
-            bool res = await _userManager.UpdateUser(user, newUser);
+            try
+            {
+                bool res = await _userManager.UpdateUser(user, newUser);
 
-            if (res)
-            {
-                return RedirectToAction("Profile");
+                if (res)
+                {
+                    return RedirectToAction("Profile");
+                }
+                else
+                {
+                    return ViewResultCreator.Error("Ошибка при сохранении или обновлении пользователя. В базу данных записано 0 элементов");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return ViewResultCreator.Error("Ошибка при сохранении или обновлении пользователя. В базу данных записано 0 элементов");
+                return ViewResultCreator.Error(ex);
             }
         }
 
         [Authorize]
         public async Task<ActionResult> DeleteUser()
         {
-            await Request.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-
-            Guid userId = Guid.Parse(User.Claims.Where(q => q.Type == ClaimTypes.NameIdentifier).First().Value.ToString());
-            await _fileManager.DeleteUserFiles(userId);
-            bool res = await _userManager.DeleteUser(userId);
-
-            if (res)
+            try
             {
-                return RedirectToAction("Index", "Home");
-            }
-            else
-            {
-                return ViewResultCreator.Error("Ошибка при удалении пользователя. Удалено 0 элементов");
-            }
-        }
+                await Request.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
-        public string testDelete()
-        {
-            return "UserDeleted";
+                Guid userId = Guid.Parse(User.Claims.Where(q => q.Type == ClaimTypes.NameIdentifier).First().Value.ToString());
+                await _fileManager.DeleteUserFiles(userId);
+
+                bool res = await _userManager.DeleteUser(userId);
+
+                if (res)
+                {
+                    return RedirectToAction("Index", "Home");
+                }
+                else
+                {
+                    return ViewResultCreator.Error("Ошибка при удалении пользователя. Удалено 0 элементов");
+                }
+            }
+            catch (Exception ex)
+            {
+                return ViewResultCreator.Error(ex);
+            }
         }
 
         public ActionResult Register()
@@ -160,49 +229,44 @@ namespace Web_CSV_Json_XML_reader.Controllers
             return View();
         }
 
-        public async Task<IResult> RegisterNew()
+        public async Task<IActionResult> RegisterNew(RegisterViewModel model)
         {
-            var form = Request.Form;
+            if (model.password != model.passwordRepeat)
+            {
+                model.errorMessage = "Повторите пароль, пароли должны совпадать";
+                return View("Register", model);
+            }
 
-            if (!form.ContainsKey("email") || !form.ContainsKey("password") || !form.ContainsKey("passwordRepeat"))
-                return Results.BadRequest("Email и/или пароль не установлены");
+            string encryptedPassword = _passwordHasher.HashPassword(null, model.password);
 
-            string email = form["email"];
-            string password = form["password"];
-
-            if (password != form["passwordRepeat"])
-                return Results.BadRequest("Пароли не совпадают");
-
-            string encryptedPassword = _passwordHasher.HashPassword(null, password);
-
-            if (!await _userManager.AddUser(email, encryptedPassword))
-                return Results.BadRequest("Произошла ошибка при добавлении пользователя");
-            else 
-                return Results.Redirect("/");
+            try
+            {
+                if (!await _userManager.AddUser(model.email, encryptedPassword))
+                    return ViewResultCreator.Error("Произошла ошибка при добавлении пользователя");
+                else
+                    return RedirectToAction("Index", "Home");
+            }
+            catch (Exception ex)
+            {
+                return ViewResultCreator.Error(ex);
+            }
         }
 
         [HttpPost]
-        public async Task<IResult> Login(string? returnUrl)
+        public async Task<IActionResult> Login()
         {
             var form = Request.Form;
-
-            if (!form.ContainsKey("email") || !form.ContainsKey("password"))
-                return Results.BadRequest("Email и/или пароль не установлены");
 
             string email = form["email"];
             string password = form["password"];
 
-            // находим пользователя 
-            //Person? person = people.FirstOrDefault(p => p.Email == email && p.Password == password);
-
             User? user = await _userManager.GetUser(email);
 
-            if (user is null) return Results.Unauthorized();
+            if (user is null) return View(true);
 
             PasswordVerificationResult verificationResult = _passwordHasher.VerifyHashedPassword(user, user.Password, password);
 
-            // если пользователь не найден, отправляем статусный код 401
-            if (verificationResult is PasswordVerificationResult.Failed) return Results.Unauthorized();
+            if (verificationResult is PasswordVerificationResult.Failed) return View(true);
 
             var claims = new List<Claim>
             {
@@ -214,7 +278,7 @@ namespace Web_CSV_Json_XML_reader.Controllers
             // установка аутентификационных куки
             
             await Request.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
-            return Results.Redirect(returnUrl ?? "/");
+            return RedirectToAction("Index","Home");
         }
 
         [HttpGet]
@@ -230,15 +294,6 @@ namespace Web_CSV_Json_XML_reader.Controllers
         [HttpPost]
         public async Task<IActionResult> JSONSave()
         {
-            //var claims = Request.HttpContext.User.Claims.Where(q => q.Type == ClaimTypes.Name).ToList();
-            //model.Data = JToken.Parse(Request.Form["Data"]);
-            //if (await _fileManager.SaveFile(FileSaver.SaveJSON(model.Data, Request), FileSaver.GetFileName(FileType.JSON, model.Name), claims.First().Value))
-            //{
-            //    string refererUrl = HttpContext.Request.Headers["Referer"].ToString();
-            //    return Results.Redirect(refererUrl); 
-            //}
-            //else
-            //    return Results.BadRequest("Ошибка при сохранении файла");
             try
             {
                 var email = Request.HttpContext.User.Claims.Where(q => q.Type == ClaimTypes.Name).ToList().First().Value;
@@ -249,7 +304,6 @@ namespace Web_CSV_Json_XML_reader.Controllers
                 if (exists)
                 {
                     res = await _fileManager.UpdateFile(fileSaveHelper, Guid.Parse(Request.Form["FileId"]));
-                    //throw new ArgumentException("IT exists | " + Guid.Parse(Request.Form["FileId"]));
                 }
                 else
                 {
@@ -341,12 +395,13 @@ namespace Web_CSV_Json_XML_reader.Controllers
             }
         }
 
-        public AccountController(IUserManager manager, IFileManager fileManager, IFileSaveManager fileSaveManager, IPasswordHasher<User> passwordHasher)
+        public AccountController(IUserManager manager, IFileManager fileManager, IFileSaveManager fileSaveManager, IPasswordHasher<User> passwordHasher, IViewModelsCreator viewModelsCreator)
         {
             _userManager = manager;
             _fileManager = fileManager;
             _fileSaveManager = fileSaveManager;
             _passwordHasher = passwordHasher;
+            _viewModelsCreator = viewModelsCreator;
         }
     }
 }

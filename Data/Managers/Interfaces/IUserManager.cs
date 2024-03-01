@@ -7,11 +7,11 @@ namespace Web_CSV_Json_XML_reader.Data.Managers.Interfaces
     {
         public Task<IReadOnlyCollection<User>> GetUsers();
 
-        public Task<User> GetUser(Guid userId);
+        public Task<User?> GetUser(Guid userId);
 
-        public Task<User> GetUser(string email);
+        public Task<User?> GetUser(string email);
 
-        public Task<User> GetUser(string email, string password);
+        public Task<User?> GetUser(string email, string password);
 
         public Task<bool> AddUser(User user);
 

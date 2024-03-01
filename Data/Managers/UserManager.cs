@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Collections.Immutable;
+using System.IO;
 using System.Text;
 using Web_CSV_Json_XML_reader.Data.DB;
 using Web_CSV_Json_XML_reader.Data.DB.Entities;
@@ -10,7 +11,6 @@ namespace Web_CSV_Json_XML_reader.Data.Managers
     public class UserManager : IUserManager
     {
         private readonly EFContext _dbContext;
-        private readonly IWebHostEnvironment _hostEnvironment;
 
         public async Task<string> DB()
         {
@@ -40,28 +40,53 @@ namespace Web_CSV_Json_XML_reader.Data.Managers
 
         public async Task<bool> UpdateUser(User oldUser, User newUser)
         {
-            User? user = await _dbContext.Users.FirstOrDefaultAsync(user => user.UserId == oldUser.UserId);
+            User? user = await _dbContext.Users.FindAsync(oldUser.UserId);
 
-            if (user is null) return false;
+            if (user is null) throw new ArgumentNullException("Пользователь не найден в базе данных");
+            
+            using (var transaction = await _dbContext.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    user.Email = newUser.Email;
+                    user.Password = newUser.Password;
 
-            user.Email = newUser.Email;
-            user.Password = newUser.Password;
+                    int res = await _dbContext.SaveChangesAsync();
+                    await transaction.CommitAsync();
 
-            int res = await _dbContext.SaveChangesAsync();
-
-            return res > 0;
+                    return res > 0;
+                }
+                catch
+                {
+                    await transaction.RollbackAsync();
+                    throw;
+                }
+            }
         }
 
         public async Task<bool> DeleteUser(Guid userId)
         {
-            User? user = await _dbContext.Users.FirstOrDefaultAsync(user => user.UserId == userId);
+            User? user = await _dbContext.Users.FindAsync(userId);
 
-            if (user is null) return false;
+            if (user is null) throw new ArgumentNullException("Пользователь не найден в базе данных");
 
-            _dbContext.Users.Remove(user);
-            int res = await _dbContext.SaveChangesAsync();
+            using (var transaction = await _dbContext.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    _dbContext.Users.Remove(user);
 
-            return res > 0;
+                    int res = await _dbContext.SaveChangesAsync();
+                    await transaction.CommitAsync();
+
+                    return res > 0;
+                }
+                catch
+                {
+                    await transaction.RollbackAsync();
+                    throw;
+                }
+            }
         }
 
         public async Task<IReadOnlyCollection<User>> GetUsers()
@@ -71,25 +96,29 @@ namespace Web_CSV_Json_XML_reader.Data.Managers
             return await s.ToListAsync();
         }
 
-        public async Task<User> GetUser(string email, string password)
+        public async Task<User?> GetUser(string email, string password)
         {
             return await _dbContext.Users.FirstOrDefaultAsync(q => q.Email == email && q.Password == password);
         }
 
-        public async Task<User> GetUser(Guid userId)
+        public async Task<User?> GetUser(Guid userId)
         {
-            return await _dbContext.Users.FirstOrDefaultAsync(q => q.UserId == userId);
+            return await _dbContext.Users.FindAsync(userId);
         }
 
-        public async Task<User> GetUser(string email)
+        public async Task<User?> GetUser(string email)
         {
             return await _dbContext.Users.FirstOrDefaultAsync(q => q.Email == email);
         }
 
         public async Task<bool> AddUser(string email, string password)
         {
-            User user = new(Guid.NewGuid(), email, password);
-            return await AddUser(user);
+            try
+            {
+                User user = new(Guid.NewGuid(), email, password);
+                return await AddUser(user);
+            }
+            catch { throw; }
         }
 
         public async Task<bool> AddUser(User user)
@@ -97,22 +126,30 @@ namespace Web_CSV_Json_XML_reader.Data.Managers
             var existingUser = await _dbContext.Users.FirstOrDefaultAsync(q => q.Email == user.Email);
 
             if (existingUser is not null)
-                return false;
+                throw new ArgumentException("Такой пользователь уже существует в базе данных");
 
-            else
+            using (var transaction = await _dbContext.Database.BeginTransactionAsync())
             {
-                _dbContext.Users.Add(user);
-                int res = await _dbContext.SaveChangesAsync();
+                try
+                {
+                    _dbContext.Users.Add(user);
 
-                return res > 0;
+                    int res = await _dbContext.SaveChangesAsync();
+                    await transaction.CommitAsync();
+
+                    return res > 0;
+                }
+                catch
+                {
+                    await transaction.RollbackAsync();
+                    throw;
+                }
             }
         }
 
-
-        public UserManager(EFContext dbContext, IWebHostEnvironment hostEnvironment)
+        public UserManager(EFContext dbContext)
         {
             _dbContext = dbContext;
-            _hostEnvironment = hostEnvironment;
         }
     }
 }

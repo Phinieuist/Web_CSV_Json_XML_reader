@@ -20,14 +20,14 @@ builder.Services.Configure<FormOptions>(options =>
     options.ValueCountLimit = 256000;
 }); //необходимо дл€ передачи бќльшего количества значений формы, потом уменьшить до вмен€емого размера
 
-builder.Services.AddTransient<IPasswordHasher<User>, PasswordHasher<User>>();
-builder.Services.AddTransient<IUserManager, UserManager>();
-builder.Services.AddTransient<IFileManager, FileManager>();
-builder.Services.AddTransient<IXMLManager, XMLHandlerOld>();
-builder.Services.AddTransient<IJSONManager, JSONHandlerOld>();
-builder.Services.AddTransient<ICSVManager, CSVHandler>();
-builder.Services.AddTransient<IFileSaveManager, FileSaveManager>();
-builder.Services.AddTransient<IViewModelsCreator, ViewModelsCreator>();
+builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+builder.Services.AddScoped<IUserManager, UserManager>();
+builder.Services.AddScoped<IFileManager, FileManager>();
+builder.Services.AddScoped<IXMLManager, XMLHandlerOld>();
+builder.Services.AddScoped<IJSONManager, JSONHandlerOld>();
+builder.Services.AddScoped<ICSVManager, CSVHandler>();
+builder.Services.AddScoped<IFileSaveManager, FileSaveManager>();
+builder.Services.AddScoped<IViewModelsCreator, ViewModelsCreator>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options => options.LoginPath = "/Account/Index");
@@ -53,10 +53,7 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-
     pattern: "{controller=Home}/{action=Index}/{id?}");
-    //pattern: "{controller=Account}/{action=Index3}/{id?}");
-
 
 app.Run();
 

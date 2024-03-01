@@ -43,45 +43,26 @@
                         <td>Дата последнего изменения файла</td>
                         <td>Действия</td>
                     </tr>
-                    @foreach (File file in Model)
-                    {
-                        <tr>
-                            <td>@GetName(file.FileName)</td>
-                            <td>@file.LastChanged.ToString()</td>
-                            <td>
-                                <div class="btn-group mb-3" role="group">
-                                    <form>
-                                        <input type="hidden" name="FileId" value="@file.FileId" />
-                                        <input class="btn btn-secondary" type="submit" formaction="/Account/OpenFile" formmethod="get" style="background-color:lawngreen" value="Просмотреть" />
-                                        <input class="btn btn-secondary" type="submit" formaction="/Account/DeleteFile" formmethod="post" style="background-color:orangered" value="Удалить" />
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                    }
+                    @if (Model != null)
+                        foreach (File file in Model)
+                        {
+                            <tr>
+                                <td>@GetName(file.FileName)</td>
+                                <td>@file.LastChanged.ToString()</td>
+                                <td>
+                                    <div class="btn-group mb-3" role="group">
+                                        <form>
+                                            <input type="hidden" name="FileId" value="@file.FileId" />
+                                            <input class="btn btn-secondary" type="submit" formaction="/Account/OpenFile" formmethod="get" style="background-color:lawngreen" value="Просмотреть" />
+                                            <input class="btn btn-secondary" type="submit" formaction="/Account/DeleteFile" formmethod="post" style="background-color:orangered" value="Удалить" />
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
                 </table>
             </div>
         </div>
     </div>
-
-
-    @* <form method="POST" action="/Account/JSONSave">
-    <div class="centered">
-    <div class="card card-body">
-    <div class="btn-group mb-3" role="group">
-    <a class="btn btn-secondary" href="/home/Index">Вернуться на главную</a>
-    <input class="btn btn-secondary" type="submit" value="Сохранить изменения" />
-    </div>
-    <div class="input-group mb-3">
-    <div class="input-group-prepend">
-    <span class="input-group-text">Название файла:</span>
-    </div>
-    <input type="text" class="form-control" aria-describedby="basic-addon3" name="Name" value="@Model.Name" />
-    </div>
-    </div>
-    </div>
-
-    </form> *@
-
 </body>
 </html>

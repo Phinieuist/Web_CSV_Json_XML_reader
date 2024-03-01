@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@using Web_CSV_Json_XML_reader.ViewModels;
+@model RegisterViewModel;
+
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset='utf-8' />
@@ -7,25 +10,31 @@
 <body>
     <h2 class="centered">Регистрация на сайте</h2>
     <div class="centered">
-    <form class="row g-3 needs-validation" novalidate name="registrationForm" method="post" action="/Account/RegisterNew">
-            <div class="card card-body">
+        <div class="card card-body">
+            @if ((Model != null) && (!string.IsNullOrEmpty(Model.errorMessage)))
+            {
+                <div class="alert alert-danger" role="alert">
+                    <span>@Model.errorMessage</span>
+                </div>
+            }
+            <form class="row g-3 needs-validation" novalidate name="registrationForm" method="post" action="/Account/RegisterNew">
                 <div class="input-group mb-3">
-                    <input class="form-control" id="validationRegisterEmail" style="width:100%;" placeholder="Введите ваш Email" type="text" name="email" required />
+                    <input class="form-control" id="validationRegisterEmail" value="@Model?.email" style="width:100%;" placeholder="Введите ваш Email" type="text" name="email" required />
                     <div class="invalid-feedback" id="emailRegisterError"></div><br>
                 </div>
                 <div class="input-group mb-3">
-                    <input class="form-control" id="validationRegisterPassword" style="width:100%;" placeholder="Введите ваш пароль, он должен содержать не менее 6 символов" type="password" name="password" required />
+                    <input class="form-control" id="validationRegisterPassword" value="@Model?.password" style="width:100%;" placeholder="Введите ваш пароль, он должен содержать не менее 6 символов" type="password" name="password" required />
                     <div class="invalid-feedback" id="passwordRegisterError"></div><br>
                 </div>
                 <div class="input-group mb-3">
-                    <input class="form-control" id="validationRegisterPasswordRepeat" style="width:100%;" placeholder="Повторите ваш пароль" type="password" name="passwordRepeat" required />
+                    <input class="form-control" id="validationRegisterPasswordRepeat" value="@Model?.passwordRepeat" style="width:100%;" placeholder="Повторите ваш пароль" type="password" name="passwordRepeat" required />
                     <div class="invalid-feedback" id="confirmRegisterPasswordError"></div><br>
                 </div>
                 <div>
                     <input class="btn btn-primary" type="submit" value="Зарегистрироваться" /><br>
                 </div>
-            </div>
-    </form>
+            </form>
+        </div>
     </div>
 </body>
 </html>
