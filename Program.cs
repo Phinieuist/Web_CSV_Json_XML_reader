@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.CompilerServices;
 using Web_CSV_Json_XML_reader.Data.DB;
 using Web_CSV_Json_XML_reader.Data.DB.Entities;
 using Web_CSV_Json_XML_reader.Data.Managers;
@@ -57,3 +58,8 @@ app.MapControllerRoute(
 
 app.Run();
 
+
+
+// Переделать способ сохранения изменённого файла (без необходимости передавать и хранить на странице исходный код файла)
+// 
+//
