@@ -5,11 +5,32 @@
 
 var dropZone;
 var divId;
+var dropzoneType;
 
 
 // Initializes the dropZone
 $(document).ready(function () {
-    dropZone = $('#dropZone');
+    if ((document.getElementById('dropZone') == null) && (document.getElementById('dropZone2') == null)) {
+        console.log("No dropzone");
+        return;
+    }
+    if (document.getElementById('dropZone') !== null) {
+        dropZone = $('#dropZone')
+        dropzoneType = 1;
+    }
+
+
+    if (document.getElementById('dropZone2') !== null) {
+        dropZone = $('#dropZone2')
+        dropzoneType = 2;
+    }
+
+    //if (dropzoneType == 0)
+     //   return;
+    //dropZone = $('#dropZone')
+
+    console.log("DropzoneType is " + dropzoneType);
+    console.log(dropZone);
     //document.querySelectorAll('#outD').forEach(q => q.className = 'input-group mb-3');
     //document.querySelectorAll('#inD').forEach(q => q.className = 'input-group-prepend');
     //document.querySelectorAll('#spn').forEach(q => q.className = 'input-group-text');
@@ -47,17 +68,19 @@ $(document).ready(function () {
         // Get the file and the file reader
         var file = event.dataTransfer.files[0];
 
-        if (!isFileExtensionAllowed(file.name)) {
+        if (!isFileExtensionAllowed(file.name) && dropzoneType == 1) {
             //dropZone.text('Invalid File Type!');
             //dropZone.addClass('error');
             alert('Файл данного типа не поддерживается');
             return;
         }
 
-        var fileExtension = file.name.split('.').pop().toLowerCase();
-        $('#fileName').val(file.name.split('.')[0]);
-        $('#fileType').val(ToModelFileType(file.name));
-        //$('#fileType').value = ToModelFileType(file.name);
+        if (dropzoneType == 1) {
+            var fileExtension = file.name.split('.').pop().toLowerCase();
+            $('#fileName').val(file.name.split('.')[0]);
+            $('#fileType').val(ToModelFileType(file.name));
+            //$('#fileType').value = ToModelFileType(file.name);
+        }
 
         var reader = new FileReader();
 
@@ -202,3 +225,36 @@ function OnDeleteUser() {
     return answer;
 }
 
+function GetKeyPair() {
+    var scheme = document.getElementById('scheme').value;
+    var host = document.getElementById('host').value;
+    var request = new XMLHttpRequest();
+    var url = scheme + "://" + host + "/Сryptography/GetNewKeyPair";
+
+    request.open('GET', url);
+    request.responseType = 'json';
+    request.send();
+
+    request.onload = function () {
+        var resp = request.response;
+
+        console.log(resp);
+        console.log('Второй ключ' + resp[1]);
+
+        document.getElementById('PublicKeyId').value = resp[0];
+        document.getElementById('PrivateKeyId').value = resp[1];
+    }
+}
+
+function CopyPrivateKey() {
+    document.getElementById('PrivateKeyInUseId').value = document.getElementById('PrivateKeyId').value;
+}
+
+function CopyPublicKey(PublicKeyId) {
+    document.getElementById('PublicKeyInUseId').value = document.getElementById(PublicKeyId).value;
+}
+
+function htmlDecode(input) {
+    var doc = new DOMParser().parseFromString(input, "text/html");
+    return doc.documentElement.textContent;
+}

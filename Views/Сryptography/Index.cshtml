@@ -1,0 +1,108 @@
+﻿@using Web_CSV_Json_XML_reader.ViewModels;
+@model СryptographyViewModel;
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Сryptography</title>
+    <meta http-equiv="Content-Type" content="text/html; charset="utf-8" />
+</head>
+<body>
+    <input type="hidden" id="scheme" value="@this.Context.Request.Scheme" />
+    <input type="hidden" id="host" value="@this.Context.Request.Host" />
+    <div class="div-for-raw">
+        <div class="card card-body">
+            @if (Model != null)
+            {
+                @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                {
+                    <div class="alert alert-danger" role="alert">
+                        <span>@Model.ErrorMessage</span>
+                    </div>
+                }
+                if (!string.IsNullOrEmpty(Model.AlertMessage))
+                {
+                    <script type="text/javascript">
+                        window.onload = function () {
+                            alert(htmlDecode('@Model.AlertMessage'));
+                            console.log(htmlDecode('@Model.AlertMessage'));
+                        };
+                    </script>
+                }
+            }
+            <form method="post">
+            <div class="card card-body">
+                <h4>Генератор ключей</h4>
+                <br />
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Открытый ключ сервера</span>
+                    </div>
+                    <input type="text" class="form-control" aria-describedby="basic-addon3" readonly name="ServerPublicKey" id="ServerPublicKeyId" value="@Model?.ServerPublicKey" />
+                    <input class="btn btn-secondary" type="button" onclick="CopyPublicKey('ServerPublicKeyId')" value="Использовать" />
+                </div>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Открытый ключ</span>
+                    </div>
+                    <input type="text" class="form-control" aria-describedby="basic-addon3" id="PublicKeyId" name="CreatedPublicKey" placeholder="Введите свой открытый ключ или сформируйте его" value="@Model?.CreatedPublicKey" />
+                    <input class="btn btn-secondary" type="button" onclick="CopyPublicKey('PublicKeyId')" value="Использовать" />
+                </div>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Закрытый ключ</span>
+                    </div>
+                    <input type="text" class="form-control" aria-describedby="basic-addon3" id="PrivateKeyId" name="CreatedPrivateKey" placeholder="Введите свой открытый ключ или сформируйте его" value="@Model?.CreatedPrivateKey" />
+                    <input class="btn btn-secondary" type="button" onclick="CopyPrivateKey()" value="Использовать" />
+                </div>
+                <input class="btn btn-secondary" type="button" onclick="GetKeyPair()" value="Сформировать новую пару открытого/закрытого ключа" />
+            </div>
+            <br />
+            
+                <div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Используемый открытый ключ</span>
+                        </div>
+                        <input type="text" class="form-control" aria-describedby="basic-addon3" name="PublicKey" id="PublicKeyInUseId" value="@Model?.PublicKey" placeholder="Введите свой открытый ключ или сформируйте его" />
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Используемый закрытый ключ</span>
+                        </div>
+                        <input type="text" class="form-control" aria-describedby="basic-addon3" name="PrivateKey" id="PrivateKeyInUseId" placeholder="Введите свой закрытый ключ или сформируйте его" value="@Model?.PrivateKey" />
+                    </div>
+
+                </div>
+                <br />
+                <div class="container">
+                    <div class="row">
+                        <div class="col">
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">Сообщение, которое необходимо подписать</span>
+                                </div>
+                                <textarea class="form-control" placeholder="Скопируйте текст файла, либо перетащите файл" style="width:100%; height:400px" id="dropZone2" name="MessageText">@Model?.MessageText</textarea>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">Подпись для сообщения</span>
+                                </div>
+                                <textarea class="form-control" placeholder="Скопируйте текст файла, либо перетащите файл" style="width:100%; height:400px" id="dropZone2" name="SignatureText">@Model?.SignatureText</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <div class ="input-group mb-3">
+                    <input class="btn btn-secondary" type="submit" formaction="/Сryptography/GetSignature" value="Получить подпись для сообщения" />
+                    <input class="btn btn-secondary" type="submit" formaction="/Сryptography/CheckSignature" value="Верефицировать сообщение" />
+                    <input class="btn btn-secondary" type="submit" formaction="/Сryptography/GetMessageFromServer" value="Получить сообщение и подпись от сервера" />
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
