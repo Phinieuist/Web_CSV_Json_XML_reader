@@ -30,6 +30,7 @@ builder.Services.AddScoped<ICSVManager, CSVHandler>();
 builder.Services.AddScoped<IFileSaveManager, FileSaveManager>();
 builder.Services.AddScoped<IViewModelsCreator, ViewModelsCreator>();
 builder.Services.AddScoped<IÑryptographyManager, ÑryptographyManager>();
+builder.Services.AddScoped<IÑryptographyKeysDBManager, ÑryptographyKeysDBManager>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options => options.LoginPath = "/Account/Index");

@@ -1,4 +1,6 @@
 ﻿@using System.Security.Claims;
+@using Web_CSV_Json_XML_reader.ViewModels;
+@model ProfileViewModel;
 
 @{
     string email = User.Claims.Where(q => q.Type == ClaimTypes.Name).First().Value.ToString();
@@ -20,7 +22,20 @@
             <br />
             <div>
                 <a class="btn btn-primary" href="/Account/ChangePassword">Изменить пароль</a>
+                
                 <a class="btn btn-primary" href="/Account/DeleteUser" onclick="return OnDeleteUser()" style="background-color:orangered">Удалить аккаунт</a>
+            </div>
+            <br />
+            <p>
+                <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#ID_keys" aria-expanded="false" aria-controls="ID_keys">Пара открытого/закрытого ключа аккаунта</button>
+            </p>
+            <div class="collapse" id="ID_keys">
+                <input type="text" readonly class="form-control" name="PublicKey"  value="@Model?.PublicKey" />
+                <br />
+                <input type="text" readonly class="form-control" name="PrivateKey" value="@Model?.PrivateKey" />
+                <br />
+                <a class="btn btn-primary" href="/Account/GetNewAccountKeyPair">Сформировать новую пару открытого/закрытого ключа для аккаунта</a>
+                <a class="btn btn-primary" href="/Account/DeleteAccountKeyPair">Удалить текущую пару открытого/закрытого ключа для аккаунта</a>
             </div>
         </div>
     </div>

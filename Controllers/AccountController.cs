@@ -27,6 +27,7 @@ namespace Web_CSV_Json_XML_reader.Controllers
         private readonly IFileSaveManager _fileSaveManager;
         private readonly IPasswordHasher<User> _passwordHasher;
         private readonly IViewModelsCreator _viewModelsCreator;
+        private readonly IСryptographyKeysDBManager _cryptographyKeysDBManager;
 
         public ActionResult Index()
         {
@@ -143,21 +144,87 @@ namespace Web_CSV_Json_XML_reader.Controllers
 
             return sb.ToString();
         }
+
         
+
         [Authorize]
-        public ActionResult ChangePassword()
+        public async  Task<IActionResult> GetNewAccountKeyPair(ProfileViewModel model)
+        {
+            try
+            {
+                Guid userId = Guid.Parse(User.Claims.Where(q => q.Type == ClaimTypes.NameIdentifier).First().Value.ToString());
+                var pair = await _cryptographyKeysDBManager.CreateNewKeyPair(userId);
+                var publicKey = pair.ExportRSAPublicKey();
+                var privateKey = pair.ExportRSAPrivateKey();
+
+                model.PublicKey = Convert.ToBase64String(publicKey);
+                model.PrivateKey = Convert.ToBase64String(privateKey);
+
+                return View("Profile", model);
+            }
+            catch(Exception ex)
+            {
+                return ViewResultCreator.Error(ex);
+            }
+        }
+
+        public async Task<IActionResult> DeleteAccountKeyPair()
+        {
+            try
+            {
+                Guid userId = Guid.Parse(User.Claims.Where(q => q.Type == ClaimTypes.NameIdentifier).First().Value.ToString());
+
+                bool res = await _cryptographyKeysDBManager.DeleteKeyPair(userId);
+
+                if (res)
+                {
+                    return RedirectToAction("Profile");
+                }
+                else
+                {
+                    return ViewResultCreator.Error("Ошибка при удалении пары ключей пользователя. Из базы данных удалено 0 элементов");
+                }
+            }
+            catch (Exception ex)
+            {
+                return ViewResultCreator.Error(ex);
+            }
+        }
+
+        [Authorize]
+        public IActionResult ChangePassword()
         {
             return View();
         }
 
         [Authorize]
-        public ActionResult Profile()
+        public async Task<IActionResult> Profile()
         {
-            return View();
+            try
+            {
+                Guid userId = Guid.Parse(User.Claims.Where(q => q.Type == ClaimTypes.NameIdentifier).First().Value.ToString());
+                var keys = await _cryptographyKeysDBManager.GetKeyPair(userId);
+                ProfileViewModel model = new();
+
+                if (keys is not null)
+                {
+                    var publicKey = keys.ExportRSAPublicKey();
+                    var privateKey = keys.ExportRSAPrivateKey();
+
+                    model.PublicKey = Convert.ToBase64String(publicKey);
+                    model.PrivateKey = Convert.ToBase64String(privateKey);
+                }
+                
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                return ViewResultCreator.Error(ex);
+            }
         }
 
         [Authorize]
-        public async Task<ActionResult> SetNewPassword(ChangePasswordViewModel model)
+        public async Task<IActionResult> SetNewPassword(ChangePasswordViewModel model)
         {
             if (model.newPassword != model.newPasswordRepeat)
             {
@@ -198,7 +265,7 @@ namespace Web_CSV_Json_XML_reader.Controllers
         }
 
         [Authorize]
-        public async Task<ActionResult> DeleteUser()
+        public async Task<IActionResult> DeleteUser()
         {
             try
             {
@@ -395,13 +462,14 @@ namespace Web_CSV_Json_XML_reader.Controllers
             }
         }
 
-        public AccountController(IUserManager manager, IFileManager fileManager, IFileSaveManager fileSaveManager, IPasswordHasher<User> passwordHasher, IViewModelsCreator viewModelsCreator)
+        public AccountController(IUserManager manager, IFileManager fileManager, IFileSaveManager fileSaveManager, IPasswordHasher<User> passwordHasher, IViewModelsCreator viewModelsCreator, IСryptographyKeysDBManager cryptographyKeysDBManager)
         {
             _userManager = manager;
             _fileManager = fileManager;
             _fileSaveManager = fileSaveManager;
             _passwordHasher = passwordHasher;
             _viewModelsCreator = viewModelsCreator;
+            _cryptographyKeysDBManager = cryptographyKeysDBManager;
         }
     }
 }

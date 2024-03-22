@@ -10,6 +10,8 @@ namespace Web_CSV_Json_XML_reader.Data.DB
 
         public DbSet<Entities.File> Files { get; set; }
 
+        public DbSet<СryptographyKey> сryptographyKeys { get; set; }
+
         public EFContext(DbContextOptions<EFContext> options)
         : base(options)
         {

@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using System.Text;
+using Web_CSV_Json_XML_reader.Data.Managers;
 using Web_CSV_Json_XML_reader.Data.Managers.Interfaces;
 using Web_CSV_Json_XML_reader.Models;
 using Web_CSV_Json_XML_reader.ViewModels;
@@ -18,6 +21,51 @@ namespace Web_CSV_Json_XML_reader.Controllers
         public IActionResult Index()
         {
             return View(new СryptographyViewModel() { ServerPublicKey = ServerKeys.PublicKey });
+        }
+
+        public async Task<string> AllPairs([FromServices] IСryptographyKeysDBManager _cryptographyKeysDBManager)
+        {
+            var entities = await _cryptographyKeysDBManager.GetAllKeys();
+
+            StringBuilder sb = new();
+
+            foreach (var item in entities)
+            {
+                sb.Append(string.Join(" | ", new string[] { item.UserId.ToString(), item.PublicKey, item.PrivateKey, item.Created.ToString() }));
+                sb.AppendLine();
+            }
+
+            return sb.ToString();
+        }
+
+        [Authorize]
+        public async Task<IActionResult> GetAccountKeyPair(СryptographyViewModel model, [FromServices] IСryptographyKeysDBManager _cryptographyKeysDBManager)
+        {
+            try
+            {
+                Guid userId = Guid.Parse(User.Claims.Where(q => q.Type == ClaimTypes.NameIdentifier).First().Value.ToString());
+                var keys = await _cryptographyKeysDBManager.GetKeyPair(userId);
+                model.ResetServiceMessages();
+
+                if (keys is not null)
+                {
+                    var publicKey = keys.ExportRSAPublicKey();
+                    var privateKey = keys.ExportRSAPrivateKey();
+
+                    model.CreatedPublicKey = Convert.ToBase64String(publicKey);
+                    model.CreatedPrivateKey = Convert.ToBase64String(privateKey);
+                }
+                else
+                {
+                    model.ErrorMessage = "Для данного аккаунта отсутствует пара ключей";
+                }
+                
+                return View("Index", model);
+            }
+            catch (Exception ex)
+            {
+                return ViewResultCreator.Error(ex);
+            }
         }
 
         public IActionResult GetNewKeyPair()
@@ -84,9 +132,9 @@ namespace Web_CSV_Json_XML_reader.Controllers
                 byte[] signature = Convert.FromBase64String(model.SignatureText);
 
                 if (_cryptographyManager.CheckSignature(model.MessageText, publicKey, signature))
-                    model.AlertMessage = "Верефикация пройдена! Сообщение не было изменено.";
+                    model.AlertMessage = "OK! Верефикация пройдена! Сообщение не было изменено.";
                 else
-                    model.AlertMessage = "Верефикация не пройдена.";
+                    model.AlertMessage = "NOT OK! Верефикация не пройдена.";
 
                 return View("Index", model);
             }

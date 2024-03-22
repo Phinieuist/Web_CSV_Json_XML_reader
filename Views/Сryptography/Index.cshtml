@@ -45,17 +45,24 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text">Открытый ключ</span>
                     </div>
-                    <input type="text" class="form-control" aria-describedby="basic-addon3" id="PublicKeyId" name="CreatedPublicKey" placeholder="Введите свой открытый ключ или сформируйте его" value="@Model?.CreatedPublicKey" />
+                    <input type="text" class="form-control" aria-describedby="basic-addon3" id="PublicKeyId" name="CreatedPublicKey" value="@Model?.CreatedPublicKey" />
                     <input class="btn btn-secondary" type="button" onclick="CopyPublicKey('PublicKeyId')" value="Использовать" />
                 </div>
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
                         <span class="input-group-text">Закрытый ключ</span>
                     </div>
-                    <input type="text" class="form-control" aria-describedby="basic-addon3" id="PrivateKeyId" name="CreatedPrivateKey" placeholder="Введите свой открытый ключ или сформируйте его" value="@Model?.CreatedPrivateKey" />
+                        <input type="text" class="form-control" aria-describedby="basic-addon3" id="PrivateKeyId" name="CreatedPrivateKey" value="@Model?.CreatedPrivateKey" />
                     <input class="btn btn-secondary" type="button" onclick="CopyPrivateKey()" value="Использовать" />
                 </div>
-                <input class="btn btn-secondary" type="button" onclick="GetKeyPair()" value="Сформировать новую пару открытого/закрытого ключа" />
+                    <div class="input-group mb-3">
+                        <input class="btn btn-secondary" type="button" onclick="GetKeyPair()" value="Сформировать новую пару открытого/закрытого ключа" />
+                        @if (User?.Identity?.IsAuthenticated ?? false)
+                        {
+                            <input class="btn btn-secondary" type="submit" formaction="/Сryptography/GetAccountKeyPair" value="Использовать ключи аккаунта" />
+                        }
+                    </div>
+                
             </div>
             <br />
             
@@ -73,6 +80,12 @@
                         <input type="text" class="form-control" aria-describedby="basic-addon3" name="PrivateKey" id="PrivateKeyInUseId" placeholder="Введите свой закрытый ключ или сформируйте его" value="@Model?.PrivateKey" />
                     </div>
 
+                </div>
+                <br />
+                <div class="input-group mb-3">
+                    <input class="btn btn-secondary" type="submit" formaction="/Сryptography/GetSignature" value="Получить подпись для сообщения" />
+                    <input class="btn btn-secondary" type="submit" formaction="/Сryptography/CheckSignature" value="Верефицировать сообщение" />
+                    <input class="btn btn-secondary" type="submit" formaction="/Сryptography/GetMessageFromServer" value="Получить сообщение и подпись от сервера" />
                 </div>
                 <br />
                 <div class="container">
@@ -96,11 +109,7 @@
                     </div>
                 </div>
                 <br />
-                <div class ="input-group mb-3">
-                    <input class="btn btn-secondary" type="submit" formaction="/Сryptography/GetSignature" value="Получить подпись для сообщения" />
-                    <input class="btn btn-secondary" type="submit" formaction="/Сryptography/CheckSignature" value="Верефицировать сообщение" />
-                    <input class="btn btn-secondary" type="submit" formaction="/Сryptography/GetMessageFromServer" value="Получить сообщение и подпись от сервера" />
-                </div>
+                
             </form>
         </div>
     </div>
